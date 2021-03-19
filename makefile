@@ -2,7 +2,6 @@
 #
 #	EXTERNAL DEPENDENCIES:
 #		pyenv
-#		jupyterlab
 #
 
 PYTHON_VERSION = 3.9.2
@@ -18,17 +17,19 @@ $(.python-version):
 	echo $(PYTHON_VERSION) > $(.python-version)
 
 $(.venv): $(.python-version)
+	echo Setting up virtualenv with python $(PYTHON_VERSION)
 	python -m venv $(.venv)
+
+setup-dev: $(.venv) requirements-dev.txt
+	$(pip) install --upgrade pip
+	$(pip) install -r requirements-dev.txt
+
+	echo Attaching .venv to Jupyter
+	$(python) -m ipykernel install --name=$(.venv)
 
 requirements.txt: $(.venv) requirements.in
 	$(pip) install pip-tools
 	$(.venv)/bin/pip-compile requirements.in 
 
 setup: $(.venv) requirements.txt
-	echo Setting up virtualenv with python $(PYTHON_VERSION)
-	$(pip) install --upgrade pip
 	$(pip) install -r requirements.txt
-
-	echo Attaching .venv to Jupyter
-	$(pip) install ipykernel
-	$(python) -m ipykernel install --user --name=$(.venv)

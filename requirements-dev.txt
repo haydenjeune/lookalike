@@ -1,0 +1,3 @@
+jupyterlab~=3.0.12
+ipykernel~=5.5.0
+pip-tools~=6.0.1
