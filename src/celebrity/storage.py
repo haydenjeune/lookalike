@@ -8,9 +8,17 @@ class LocalCelebrityStorageException(Exception):
     pass
 
 
+class ListNotFound(Exception):
+    pass
+
+
 class CelebrityStorage(ABC):
     @abstractmethod
     def persist(self, celebrities: List[str]):
+        pass
+
+    @abstractmethod
+    def retrieve(self) -> List[str]:
         pass
 
 
@@ -42,3 +50,16 @@ class LocalCelebrityStorage(CelebrityStorage):
             raise LocalCelebrityStorageException(
                 "Failed to write to storage file"
             ) from e
+
+    def retrieve(self) -> List[str]:
+        path = Path(self.storage_root).resolve()
+        if not path.exists():
+            raise LocalCelebrityStorageException("Storage directory does not exist")
+
+        try:
+            with open(path / self._storage_file_name, "r") as f:
+                content = f.read()
+        except OSError as e:
+            raise LocalCelebrityStorageException("Failed to read storage file") from e
+
+        return content.splitlines()
