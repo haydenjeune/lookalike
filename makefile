@@ -36,4 +36,4 @@ setup: $(.venv) requirements.txt
 
 test:
 	# invoke pytest through python to ensure repo root dir is in PYTHONPATH
-	$(python) -m pytest tests
+	$(python) -m pytest tests -v

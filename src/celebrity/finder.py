@@ -30,5 +30,9 @@ class UrlCelebrityListFinder(CelebrityListFinder):
                 f"Received {resp.status_code} from {resp.url} with content: {resp.content}"
             )
 
-        raw_list = resp.content.strip().decode("unicode-escape").split("\n")
-        return [name.title().strip() for name in raw_list]
+        names = resp.text.strip().split("\n")
+        names = map(lambda n: n.title(), names)
+        names = map(lambda n: n.strip(), names)
+        names = filter(lambda n: n != "", names)
+
+        return list(names)
