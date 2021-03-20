@@ -3,3 +3,4 @@ ipykernel~=5.5.0
 pip-tools~=6.0.1
 pytest~=6.2.2
 requests-mock~=1.8.0
+pyfakefs~=4.4.0
