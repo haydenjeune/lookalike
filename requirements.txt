@@ -18,6 +18,7 @@ idna==2.10
     # via requests
 numpy==1.20.1
     # via
+    #   -r requirements.in
     #   facenet-pytorch
     #   torch
     #   torchvision
