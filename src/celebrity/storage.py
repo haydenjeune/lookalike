@@ -26,7 +26,7 @@ class LocalCelebrityStorage(CelebrityStorage):
     _storage_file_name: str = "celebrities.txt"
 
     def persist(self, celebrities: List[str]):
-        path = Path(self.storage_root)
+        path = Path(self.storage_root).resolve()
         try:
             if not path.exists():
                 path.mkdir()
