@@ -33,3 +33,7 @@ requirements.txt: $(.venv) requirements.in
 
 setup: $(.venv) requirements.txt
 	$(pip) install -r requirements.txt
+
+test:
+	# invoke pytest through python to ensure repo root dir is in PYTHONPATH
+	$(python) -m pytest tests
