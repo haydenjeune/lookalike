@@ -1,6 +1,6 @@
 import pytest
 import requests_mock
-from src.image.retrieve import WikipediaImageRetriver
+from src.image.retrieve import WikipediaImageRetriever
 
 
 @pytest.fixture
@@ -14,14 +14,14 @@ def test_khloe_kardashian_html():
 
 
 def test_find_image_page_url_finds_gene_wilder_image(test_gene_wilder_html):
-    sut = WikipediaImageRetriver()
+    sut = WikipediaImageRetriever()
 
     link = sut._find_image_page_url(test_gene_wilder_html)
     assert link == "/wiki/File:Gene_Wilder_1970.JPG"
 
 
 def test_find_image_page_url_finds_khloe_kardashian_image(test_khloe_kardashian_html):
-    sut = WikipediaImageRetriver()
+    sut = WikipediaImageRetriever()
 
     link = sut._find_image_page_url(test_khloe_kardashian_html)
     assert link == "/wiki/File:Khloe_Kardashian_Glamour_2.png"
