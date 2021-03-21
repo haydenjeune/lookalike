@@ -7,9 +7,13 @@ from torch import no_grad
 from numpy import ndarray
 
 
+class FaceNotFound(Exception):
+    pass
+
+
 class ImageVectoriser(ABC):
     @abstractmethod
-    def vectorise(self, image: Image.Image) -> List[float]:
+    def vectorise(self, image: Image.Image) -> ndarray:
         pass
 
 
@@ -22,6 +26,8 @@ class FaceNetPyTorchImageVectoriser(ImageVectoriser):
     def vectorise(self, image: Image.Image) -> ndarray:
         # Get cropped and prewhitened image tensor
         cropped = self.face_detector(image)
+        if cropped is None:
+            raise FaceNotFound("No face found in image")
 
         # Calculate embedding (unsqueeze to add batch dimension, squeeze to remove it again)
         vec = self.face_vectoriser(cropped.unsqueeze(0)).squeeze()

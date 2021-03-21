@@ -5,6 +5,8 @@ from pathlib import Path
 from typing import Dict, List, Optional
 import json
 
+from numpy import ndarray, array
+
 
 class IndexFileException(Exception):
     pass
@@ -21,7 +23,9 @@ class VectorIndex(ABC):
             except OSError as e:
                 raise IndexFileException("Failed to create index directory")
 
-        self._vectors = self.load()
+        # for now we use List[float] in json even though it's inefficient
+        # eventually I'll serialise the ndarray to bytes or something
+        self._vectors: Dict[str, List[float]] = self.load()
 
     def load(self) -> Dict[str, List[float]]:
         # read file
@@ -39,11 +43,11 @@ class VectorIndex(ABC):
         except JSONDecodeError as e:
             raise IndexFileException("Error parsing index file")
 
-    def add(self, celebrity_name: str, vector: List[float]):
-        self._vectors[celebrity_name] = vector
+    def add(self, celebrity_name: str, vector: ndarray):
+        self._vectors[celebrity_name] = vector.tolist()
 
-    def get(self, celebrity_name: str) -> Optional[List[float]]:
-        return self._vectors.get(celebrity_name, None)
+    def get(self, celebrity_name: str) -> Optional[ndarray]:
+        return array(self._vectors.get(celebrity_name, None))
 
     def save(self):
         try:
