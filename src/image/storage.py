@@ -36,7 +36,11 @@ class LocalImageStorage(ImageStorage):
             ) from e
 
         try:
-            with open(path / "images" / celebrity_name / ".jpg", "wb") as f:
-                image.save(f, format="jpeg")
+            with open(path / (celebrity_name + ".jpg"), "wb") as f:
+                image.convert("RGB").save(f, format="jpeg")
         except OSError as e:
             raise LocalImageStorageException("Failed to write to image file") from e
+
+    def exists(self, celebrity_name: str) -> bool:
+        file_path = Path(self.storage_root) / (celebrity_name + ".jpg")
+        return file_path.exists()

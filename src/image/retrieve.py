@@ -23,7 +23,7 @@ class NoImageException(ImageRetrieverException):
     pass
 
 
-class InvalidInfoBoxesException(ImageRetrieverException):
+class InvalidInfoBoxException(ImageRetrieverException):
     pass
 
 
@@ -53,7 +53,10 @@ class WikipediaImageRetriever(ImageRetriever):
         if resp.status_code == 404:
             raise NoPageException(f"No main page found at {resp.url}")
 
-        image_page_url = self._find_image_page_url(resp.text)
+        try:
+            image_page_url = self._find_image_page_url(resp.text)
+        except InvalidInfoBoxException as e:
+            raise ImageRetrieverException(f"Failed to process {name}: {str(e)}") from e
 
         # check for relative link
         if image_page_url.startswith("/"):
@@ -83,16 +86,16 @@ class WikipediaImageRetriever(ImageRetriever):
         # find the infoboxes
         infoboxes = page.find_all("table", {"class": "infobox"})
         if len(infoboxes) > 1:
-            raise InvalidInfoBoxesException(
+            raise InvalidInfoBoxException(
                 f"Invalid assumption that the infobox class is unique. {len(infoboxes)} found"
             )
         elif len(infoboxes) == 0:
-            raise InvalidInfoBoxesException("No infoboxes found")
+            raise InvalidInfoBoxException("No infoboxes found")
 
         # get the biggest image in the infobox
         imgs = infoboxes[0].find_all("img")
         if len(imgs) == 0:
-            raise NoImageException("No images found in the infobox")
+            raise InvalidInfoBoxException("No images found in the infobox")
 
         def get_img_size(img) -> int:
             width = int(img.get("width", 0))

@@ -1,17 +1,8 @@
-from abc import ABC, abstractmethod
 from dataclasses import dataclass
 
 from src.celebrity.finder import UrlCelebrityListFinder
 from src.celebrity.storage import LocalCelebrityStorage
-
-
-class Orchestrator(ABC):
-    def __call__(self):
-        self.run()
-
-    @abstractmethod
-    def run(self):
-        pass
+from src.orchestration.base import Orchestrator
 
 
 @dataclass
