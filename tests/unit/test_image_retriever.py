@@ -16,12 +16,15 @@ def test_khloe_kardashian_html():
 def test_find_image_page_url_finds_gene_wilder_image(test_gene_wilder_html):
     sut = WikipediaImageRetriever()
 
-    link = sut._find_image_page_url(test_gene_wilder_html)
-    assert link == "/wiki/File:Gene_Wilder_1970.JPG"
+    links = set(sut._find_image_page_urls(test_gene_wilder_html))
+    assert "https://en.wikipedia.org/wiki/File:Gene_Wilder_1970.JPG" in links
+    assert "https://en.wikipedia.org/wiki/File:Gene_Wilder_(signature).png" in links
+    assert len(links) == 2
 
 
 def test_find_image_page_url_finds_khloe_kardashian_image(test_khloe_kardashian_html):
     sut = WikipediaImageRetriever()
 
-    link = sut._find_image_page_url(test_khloe_kardashian_html)
-    assert link == "/wiki/File:Khloe_Kardashian_Glamour_2.png"
+    links = set(sut._find_image_page_urls(test_khloe_kardashian_html))
+    assert "https://en.wikipedia.org/wiki/File:Khloe_Kardashian_Glamour_2.png" in links
+    assert len(links) == 1
