@@ -7,7 +7,7 @@ from urllib.parse import quote
 from typing import Iterable
 
 from bs4 import BeautifulSoup
-from PIL import Image
+from PIL import Image, UnidentifiedImageError
 import requests
 
 log = logging.getLogger(__name__)
@@ -66,6 +66,8 @@ class WikipediaImageRetriever(ImageRetriever):
                     image_url = self._find_full_image_url(resp.text)
                     resp = requests.get(image_url, stream=True)
                     yield Image.open(io.BytesIO(resp.content))
+                except UnidentifiedImageError as e:
+                    log.exception(f" {url}", exc_info=e)
                 except ImageRetrieverException as e:
                     log.exception(f"Failed to get main image from {url}", exc_info=e)
 
@@ -100,5 +102,5 @@ class WikipediaImageRetriever(ImageRetriever):
         # check scheme has been specified, sometimes wikipedia specifies it like //host.com/image.jpg
         if not image_url.startswith("http") and image_url.startswith("//"):
             image_url = "https:" + image_url
-        
+
         return image_url

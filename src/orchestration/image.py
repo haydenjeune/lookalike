@@ -19,9 +19,10 @@ class LocalImageDownloader(Orchestrator):
         image_storage = LocalImageStorage(self.storage_path + "/images")
 
         for name in tqdm(celebs):
-            if not image_storage.exists(name):
-                try:
-                    im = wikipedia.retrieve(name)
-                    image_storage.persist(name, im)
-                except ImageRetrieverException as e:
-                    print(str(e))
+            try:
+                for i, image in enumerate(wikipedia.retrieve(name)):
+                    image_storage.persist(name, str(i), image)
+            except ImageRetrieverException as e:
+                print(str(e))
+            except Exception as e:
+                print(f"Error in {name}: str(e)")

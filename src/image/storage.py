@@ -29,33 +29,34 @@ class LocalImageStorage(ImageStorage):
 
     storage_root: str
 
-    def _get_filepath(self, celebrity_name: str) -> Path:
+    def _get_filepath(self, celebrity_name: str, key: str) -> Path:
         root = Path(self.storage_root).resolve()
-        return root / (celebrity_name + ".jpg")
+        return root / celebrity_name / (key + ".jpg")
 
-    def persist(self, celebrity_name: str, image: Image.Image):
+    def persist(self, celebrity_name: str, key: str, image: Image.Image):
         path = Path(self.storage_root).resolve()
         try:
             if not path.exists():
                 path.mkdir()
+            path /= celebrity_name
+            if not path.exists():
+                path.mkdir()
         except OSError as e:
-            raise LocalImageStorageException(
-                "Failed to create image storage directory"
-            ) from e
+            raise LocalImageStorageException("Failed to create image directory") from e
 
         try:
-            with open(self._get_filepath(celebrity_name), "wb") as f:
+            with open(self._get_filepath(celebrity_name, key), "wb") as f:
                 image.convert("RGB").save(f, format="jpeg")
         except OSError as e:
             raise LocalImageStorageException("Failed to write to image file") from e
 
-    def exists(self, celebrity_name: str) -> bool:
-        return self._get_filepath(celebrity_name).exists()
+    def exists(self, celebrity_name: str, key: str) -> bool:
+        return self._get_filepath(celebrity_name, key).exists()
 
-    def retrieve(self, celebrity_name: str) -> Image.Image:
-        filepath = self._get_filepath(celebrity_name)
+    def retrieve(self, celebrity_name: str, key: str) -> Image.Image:
+        filepath = self._get_filepath(celebrity_name, key)
         if not filepath.exists():
-            raise ImageNotFound(f"No image for {celebrity_name} exists")
+            raise ImageNotFound(f"No image for {celebrity_name}/{key} exists")
 
         try:
             return Image.open(filepath)
