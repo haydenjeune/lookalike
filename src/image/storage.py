@@ -29,10 +29,6 @@ class LocalImageStorage(ImageStorage):
 
     storage_root: str
 
-    def _get_filepath(self, celebrity_name: str, key: str) -> Path:
-        root = Path(self.storage_root).resolve()
-        return root / celebrity_name / (key + ".jpg")
-
     def persist(self, celebrity_name: str, key: str, image: Image.Image):
         path = Path(self.storage_root).resolve()
         try:
@@ -62,3 +58,22 @@ class LocalImageStorage(ImageStorage):
             return Image.open(filepath)
         except OSError as e:
             raise LocalImageStorageException(f"Failed to read image {filepath}") from e
+
+    def retrieve_all(self, celebrity_name: str) -> List[Image.Image]:
+        image_paths = list(self._get_celeb_dir(celebrity_name).glob("*.jpg"))
+        if len(image_paths) == 0:
+            ImageNotFound(f"No images for {celebrity_name} exists")
+
+        try:
+            return [Image.open(file) for file in image_paths]
+        except OSError as e:
+            raise LocalImageStorageException(
+                f"Failed to read images for {celebrity_name}"
+            ) from e
+
+    def _get_celeb_dir(self, celebrity_name: str) -> Path:
+        root = Path(self.storage_root).resolve()
+        return root / celebrity_name
+
+    def _get_filepath(self, celebrity_name: str, key: str) -> Path:
+        return self._get_celeb_dir(celebrity_name) / (key + ".jpg")
