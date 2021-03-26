@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import List
+from typing import List, Optional
 
 from PIL import Image
 from facenet_pytorch import MTCNN, InceptionResnetV1
@@ -23,11 +23,11 @@ class FaceNetPyTorchImageVectoriser(ImageVectoriser):
         self.face_vectoriser = InceptionResnetV1(pretrained="vggface2").eval()
 
     @no_grad()
-    def vectorise(self, image: Image.Image) -> ndarray:
+    def vectorise(self, image: Image.Image) -> Optional[ndarray]:
         # Get cropped and prewhitened image tensor
         cropped = self.face_detector(image)
         if cropped is None:
-            raise FaceNotFound("No face found in image")
+            return None
 
         # Calculate embedding (unsqueeze to add batch dimension, squeeze to remove it again)
         vec = self.face_vectoriser(cropped.unsqueeze(0)).squeeze()

@@ -3,7 +3,11 @@ from logging import getLogger
 
 from src.celebrity.storage import LocalCelebrityStorage
 from src.image.storage import LocalImageStorage
-from src.index.builder import FaceNetPyTorchImageVectoriser, FaceNotFound
+from src.index.builder import (
+    FaceNetPyTorchImageVectoriser,
+    FaceNotFound,
+    MedianVectorAggregator,
+)
 from src.index.storage import VectorIndex
 from src.orchestration.base import Orchestrator
 
@@ -22,15 +26,21 @@ class ImagePreProcessing(Orchestrator):
         image_storage = LocalImageStorage(self.storage_path + "/images")
         index = VectorIndex(self.storage_path + "/vec")
         vectoriser = FaceNetPyTorchImageVectoriser()
+        aggregator = MedianVectorAggregator()
 
         for name in tqdm(celebs):
-            if image_storage.exists(name):
-                try:
-                    im = image_storage.retrieve(name)
-                    vec = vectoriser.vectorise(im)
-                    index.add(name, vec)
-                except Exception as e:
-                    log.exception(f"Error occured processing {name}: {e}")
-            else:
-                print(f"{name} not found")
+            try:
+                images = image_storage.retrieve_all(name)
+                if len(images) > 0:
+                    vectors = []
+                    for image in images:
+                        vec = vectoriser.vectorise(image)
+                        if vec is not None:
+                            vectors.append(vec)
+                    combined = aggregator.aggregate(vectors)
+                    index.add(name, combined)
+                else:
+                    print(f"{name} not found")
+            except Exception as e:
+                log.exception(f"Error occured processing {name}: {e}")
         index.save()
