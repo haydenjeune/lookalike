@@ -1,0 +1,23 @@
+swagger: "2.0"
+
+info:
+  title: "lookalike"
+  version: "1.0"
+
+basePath: /v1.0
+
+paths:
+  /ping:
+    get:
+      summary: Ping Endpoint
+      description: Ping Endpoint
+      operationId: app.ping
+      produces:
+        - text/plain;
+      responses:
+        200:
+          description: ping response
+          schema:
+            type: string
+          examples:
+            "text/plain": "pong"

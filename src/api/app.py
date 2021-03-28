@@ -1,6 +1,12 @@
-from flask import Flask
-app = Flask(__name__)
+import connexion
 
-@app.route('/')
-def hello_world():
-    return 'Hello, World!'
+
+def ping():
+    return "pong"
+
+    import connexion
+
+
+app = connexion.FlaskApp(__name__)
+app.add_api("spec.yaml")
+app.run(port=8080)

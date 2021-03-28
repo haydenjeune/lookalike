@@ -39,4 +39,4 @@ test:
 	$(python) -m pytest tests -v
 
 start-api: setup
-	FLASK_APP=src/api/app.py $(.venv)/bin/flask run
+	$(python) src/api/app.py
