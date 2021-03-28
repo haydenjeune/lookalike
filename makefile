@@ -37,3 +37,6 @@ setup: $(.venv) requirements.txt
 test:
 	# invoke pytest through python to ensure repo root dir is in PYTHONPATH
 	$(python) -m pytest tests -v
+
+start-api: setup
+	FLASK_APP=src/api/app.py $(.venv)/bin/flask run
