@@ -2,7 +2,7 @@ from abc import ABC
 from dataclasses import dataclass
 from json.decoder import JSONDecodeError
 from pathlib import Path
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Union
 import json
 
 from numpy import ndarray, array
@@ -26,6 +26,9 @@ class VectorIndex(ABC):
         # for now we use List[float] in json even though it's inefficient
         # eventually I'll serialise the ndarray to bytes or something
         self._vectors: Dict[str, List[float]] = self.load()
+
+    def __iter__(self) -> Union[str, ndarray]:
+        yield from self._vectors.items()
 
     def load(self) -> Dict[str, List[float]]:
         # read file
