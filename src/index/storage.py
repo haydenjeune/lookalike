@@ -2,7 +2,7 @@ from abc import ABC
 from dataclasses import dataclass
 from json.decoder import JSONDecodeError
 from pathlib import Path
-from typing import Dict, List, Optional, Union
+from typing import Dict, Iterable, List, Optional, Union, Tuple
 import json
 
 from numpy import ndarray, array
@@ -13,7 +13,7 @@ class IndexFileException(Exception):
 
 
 class VectorIndex(ABC):
-    def __init__(self, storage_dir):
+    def __init__(self, storage_dir: Union[str, Path]):
         self.storage_file = Path(storage_dir) / "vectors.json"
 
         # make the desired dir if it doesn't exist
@@ -21,14 +21,15 @@ class VectorIndex(ABC):
             try:
                 self.storage_file.parent.mkdir()
             except OSError as e:
-                raise IndexFileException("Failed to create index directory")
+                raise IndexFileException(f"Failed to create index directory {self.storage_file.parent}")
 
         # for now we use List[float] in json even though it's inefficient
         # eventually I'll serialise the ndarray to bytes or something
         self._vectors: Dict[str, List[float]] = self.load()
 
-    def __iter__(self) -> Union[str, ndarray]:
-        yield from self._vectors.items()
+    @property
+    def vectors(self) -> List[Tuple[str, ndarray]]:
+        return [(name, array(vec)) for name, vec in self._vectors.items()]
 
     def load(self) -> Dict[str, List[float]]:
         # read file

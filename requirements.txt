@@ -7,7 +7,9 @@
 --index-url https://pypi.python.org/simple
 
 attrs==20.3.0
-    # via jsonschema
+    # via
+    #   environ-config
+    #   jsonschema
 beautifulsoup4==4.9.3
     # via -r requirements.in
 certifi==2020.12.5
@@ -21,6 +23,8 @@ click==7.1.2
 clickclick==20.10.2
     # via connexion
 connexion[swagger-ui]==2.7.0
+    # via -r requirements.in
+environ-config==20.1.0
     # via -r requirements.in
 facenet-pytorch==2.5.2
     # via -r requirements.in

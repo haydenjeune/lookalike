@@ -39,4 +39,6 @@ test:
 	$(python) -m pytest tests -v
 
 start-api: setup
-	$(python) src/api/app.py
+	FLASK_APP=src/api/app \
+	FLASK_ENV=development \
+	$(python) -m flask run
