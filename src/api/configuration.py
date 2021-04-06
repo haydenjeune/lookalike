@@ -8,7 +8,7 @@ VECTOR_INDEX_FILEPATH = "VECTOR_INDEX_FILEPATH"
 @environ.config()
 class Config:
     vector_index_filepath = environ.var(
-        name=VECTOR_INDEX_FILEPATH, converter=Path, default="/Users/hayden.jeune/.celebstore/vec"
+        name=VECTOR_INDEX_FILEPATH, default="/Users/hayden.jeune/.celebstore/vec"
     )
 
 

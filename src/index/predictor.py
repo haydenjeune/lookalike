@@ -7,8 +7,8 @@ from facenet_pytorch import MTCNN, InceptionResnetV1
 from torch import no_grad
 from numpy import ndarray, dot
 
-from src.index.builder import FaceNetPyTorchImageVectoriser, ImageVectoriser
-from src.index.storage import VectorIndex
+from index.builder import FaceNetPyTorchImageVectoriser, ImageVectoriser
+from index.storage import VectorIndex
 
 
 class FaceNotFound(Exception):

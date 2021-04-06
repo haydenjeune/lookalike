@@ -9,7 +9,7 @@ paths:
     get:
       summary: Ping Endpoint
       description: Ping Endpoint
-      operationId: app.ping
+      operationId: api.app.ping
       responses:
         200:
           description: ping response
@@ -24,7 +24,7 @@ paths:
     post:
       summary: Finds your lookalike
       description: Given a picture, find celebrities that looks most like the picture.
-      operationId: app.find_lookalike
+      operationId: api.app.find_lookalike
       requestBody:
         required: true
         content:
