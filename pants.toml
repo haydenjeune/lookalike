@@ -4,9 +4,10 @@ backend_packages = ["pants.backend.python"]
 
 [python-setup]
 resolver_version = "pip-2020-resolver"
+interpreter_constraints = ["~=3.8"]
 
 [source]
 root_patterns = [
-  '/src',
-  '/tests',
+  'src',
+  'tests',
 ]
