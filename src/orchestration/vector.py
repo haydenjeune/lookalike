@@ -1,15 +1,14 @@
 from dataclasses import dataclass
 from logging import getLogger
 
-from src.celebrity.storage import LocalCelebrityStorage
-from src.image.storage import LocalImageStorage
-from src.index.builder import (
+from celebrity.storage import LocalCelebrityStorage
+from image.storage import LocalImageStorage
+from index.builder import (
     FaceNetPyTorchImageVectoriser,
-    FaceNotFound,
     MedianVectorAggregator,
 )
-from src.index.storage import VectorIndex
-from src.orchestration.base import Orchestrator
+from index.storage import VectorIndex
+from orchestration.base import Orchestrator
 
 from tqdm import tqdm
 
@@ -44,3 +43,7 @@ class ImagePreProcessing(Orchestrator):
             except Exception as e:
                 log.exception(f"Error occured processing {name}: {e}")
         index.save()
+
+
+if __name__ == "__main__":
+    ImagePreProcessing().run()

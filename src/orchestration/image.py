@@ -1,10 +1,10 @@
 from dataclasses import dataclass
 from tqdm import tqdm
 
-from src.image.storage import LocalImageStorage
-from src.celebrity.storage import LocalCelebrityStorage
-from src.image.retrieve import ImageRetrieverException, WikipediaImageRetriever
-from src.orchestration.base import Orchestrator
+from image.storage import LocalImageStorage
+from celebrity.storage import LocalCelebrityStorage
+from image.retrieve import ImageRetrieverException, WikipediaImageRetriever
+from orchestration.base import Orchestrator
 
 
 @dataclass
@@ -26,3 +26,6 @@ class LocalImageDownloader(Orchestrator):
                 print(str(e))
             except Exception as e:
                 print(f"Error in {name}: str(e)")
+
+if __name__ == "__main__":
+    LocalImageDownloader().run()

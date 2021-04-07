@@ -1,8 +1,8 @@
 from dataclasses import dataclass
 
-from src.celebrity.finder import UrlCelebrityListFinder
-from src.celebrity.storage import LocalCelebrityStorage
-from src.orchestration.base import Orchestrator
+from celebrity.finder import UrlCelebrityListFinder
+from celebrity.storage import LocalCelebrityStorage
+from orchestration.base import Orchestrator
 
 
 @dataclass
@@ -16,3 +16,6 @@ class LocalListDownloader(Orchestrator):
 
         storage = LocalCelebrityStorage(storage_root=self.storage_path)
         storage.persist(celeb_list)
+
+if __name__ == "__main__":
+    LocalListDownloader().run()
