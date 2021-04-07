@@ -23,6 +23,8 @@ def find_lookalike(body: bytes):
 
 connexion_app = connexion.FlaskApp(__name__, specification_dir=Path(__file__).parent)
 connexion_app.add_api("spec.yaml", strict_validation=True)
+connexion_app.add_error_handler(Exception, connexion.FlaskApp.common_error_handler)
+
 
 if __name__ == "__main__":
     connexion_app.run(port=5000)
