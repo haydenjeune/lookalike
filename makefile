@@ -25,25 +25,19 @@ clean:
 	rm $(.python-version)
 	rm -rf $(.venv)
 
-setup-dev: $(.venv) requirements-dev.txt
-	$(pip) install --upgrade pip
-	$(pip) install -r requirements-dev.txt
-
-	echo Attaching .venv to Jupyter
-	$(python) -m ipykernel install --name=$(.venv)
-
 $(requirements.txt): $(.venv) requirements.in
 	$(pip) install pip-tools
 	$(.venv)/bin/pip-compile requirements.in -o $(requirements.txt)
 
 setup: $(.venv) $(requirements.txt)
+	$(pip) install --upgrade pip
 	$(pip) install -r $(requirements.txt)
 
+	echo Attaching .venv to Jupyter
+	$(python) -m ipykernel install --name=$(.venv)
+
 test:
-	# invoke pytest through python to ensure repo root dir is in PYTHONPATH
-	$(python) -m pytest tests -v
+	./pants test tests/unit::
 
 start-api: setup
-	FLASK_APP=src/api/app \
-	FLASK_ENV=development \
-	$(python) -m flask run
+	./pants run src/api
