@@ -1,3 +1,19 @@
 {
-    "python.formatting.provider": "black"
+    "python.formatting.provider": "black",
+    "python.pythonPath": "${workspaceFolder}/.venv/bin/python",
+    "python.autoComplete.extraPaths": [
+        "src",
+        "tests"
+    ],
+    "python.analysis.extraPaths": [
+        "src",
+        "tests"
+    ],
+    "python.testing.pytestEnabled": true,
+    "python.testing.unittestEnabled": false,
+    "python.testing.nosetestsEnabled": false,
+    "python.testing.pytestArgs": [
+        "tests/unit"
+    ],
+    "python.envFile": "${workspaceFolder}/.vscode/.env",
 }

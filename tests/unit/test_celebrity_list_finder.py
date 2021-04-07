@@ -1,7 +1,7 @@
 import pytest
 import requests_mock
 
-from src.celebrity.finder import UrlCelebrityListFinder
+from celebrity.finder import UrlCelebrityListFinder
 
 
 @pytest.fixture

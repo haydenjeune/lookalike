@@ -1,6 +1,6 @@
 import numpy as np
 
-from src.index.builder import MedianVectorAggregator
+from index.builder import MedianVectorAggregator
 
 
 def test_median_vector_aggregator():

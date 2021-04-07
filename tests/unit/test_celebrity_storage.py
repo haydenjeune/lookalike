@@ -2,7 +2,7 @@ from pathlib import Path
 
 import pytest
 
-from src.celebrity.storage import LocalCelebrityStorage, LocalCelebrityStorageException
+from celebrity.storage import LocalCelebrityStorage, LocalCelebrityStorageException
 
 # fs comes from the pyfakefs package
 def test_local_celebrity_storage_saves_file(fs):

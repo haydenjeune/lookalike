@@ -1,6 +1,6 @@
 import pytest
 import requests_mock
-from src.image.retrieve import WikipediaImageRetriever
+from image.retrieve import WikipediaImageRetriever
 
 
 @pytest.fixture
