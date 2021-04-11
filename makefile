@@ -41,3 +41,8 @@ test:
 
 start-api: setup
 	./pants run src/api
+
+start-web:
+	npm --prefix web/lookalike-web start
+
+start: start-web start-api
