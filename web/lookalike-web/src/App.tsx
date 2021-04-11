@@ -1,15 +1,30 @@
 import React from 'react';
+import { makeStyles, createStyles, Theme } from '@material-ui/core/styles';
 import './App.css';
 import Webcam from 'react-webcam';
 import IconButton from '@material-ui/core/IconButton';
 import PhotoCamera from '@material-ui/icons/PhotoCamera';
 import ReplayIcon from '@material-ui/icons/Replay';
+import DoneIcon from '@material-ui/icons/Done';
 
-const CapturedPicture = () => {
-
-}
+const useStyles = makeStyles((theme: Theme) =>
+  createStyles({
+    button: {
+      transform: "translateY(-120%)",
+      backgroundColor: "rgba(255, 255, 255, 0.7)",
+      '&:hover': {
+        backgroundColor: "rgba(255, 255, 255, 0.8)",
+      },
+      margin: "0px 10px"
+    },
+    image: {
+      width: "100%"
+    },
+  }),
+);
 
 const WebcamCapture = () => {
+  const classes = useStyles();
   const webcamRef = React.useRef(null);
   const [imgSrc, setImgSrc] = React.useState<string>("");
   const [photoTaken, setPhotoTaken] = React.useState<boolean>(false);
@@ -24,12 +39,29 @@ const WebcamCapture = () => {
 
   if (imgSrc !== "") {
     return (
-      <>
-        <img src={imgSrc} />
-        <IconButton color="primary" aria-label="retake picture" component="span" onClick={()=>{setImgSrc("")}}>
+      <div>
+        <img 
+          src={imgSrc}
+          className={classes.image}
+        />
+        <IconButton 
+          color="secondary"
+          className={classes.button}
+          aria-label="retake picture"
+          component="span"
+          onClick={()=>{setImgSrc("")}}
+        >
           <ReplayIcon fontSize="large"/>
         </IconButton>
-      </>
+        <IconButton 
+          color="primary"
+          className={classes.button}
+          aria-label="accept picture"
+          component="span"
+        >
+          <DoneIcon fontSize="large"/>
+        </IconButton>
+      </div>
     );
   }
 
@@ -38,11 +70,19 @@ const WebcamCapture = () => {
       <Webcam
         audio={false}
         ref={webcamRef}
+        className={classes.image}
         screenshotFormat="image/jpeg"
         videoConstraints={{facingMode: "user"}}
         mirrored={true}
+        style={{width: "100%"}}
       />
-      <IconButton color="primary" aria-label="take picture" component="span" onClick={capture}>
+      <IconButton 
+        color="primary"
+        className={classes.button}
+        aria-label="take picture"
+        component="span"
+        onClick={capture}
+      >
           <PhotoCamera fontSize="large"/>
       </IconButton>
     </>
