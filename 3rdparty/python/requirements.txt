@@ -58,8 +58,12 @@ environ-config==20.1.0
     # via -r requirements.in
 facenet-pytorch==2.5.2
     # via -r requirements.in
+flask-cors==3.0.10
+    # via -r requirements.in
 flask==1.1.2
-    # via connexion
+    # via
+    #   connexion
+    #   flask-cors
 idna==2.10
     # via
     #   anyio
@@ -262,6 +266,7 @@ six==1.15.0
     #   argon2-cffi
     #   bleach
     #   cycler
+    #   flask-cors
     #   isodate
     #   jsonschema
     #   openapi-schema-validator
