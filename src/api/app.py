@@ -5,7 +5,6 @@ from io import BytesIO
 from pathlib import Path
 from flask_cors import CORS
 import base64
-from urllib.parse import quote
 
 from api import configuration
 from index.predictor import FaceNetDotProductPredictor
@@ -23,15 +22,7 @@ def find_lookalike(body: bytes):
     body = base64.b64decode(body)
     im = Image.open(BytesIO(body)).convert("RGB")
     celebs = predictor.predict(im)
-    response = [
-        {
-            "name": c.name,
-            "similarity": c.similarity,
-            "image": quote(f"/Users/hayden.jeune/.celebstore/images/{c.name}/0.jpg"),
-        }
-        for c in celebs
-    ]
-    return response, 200
+    return celebs, 200
 
 
 connexion_app = connexion.FlaskApp(__name__, specification_dir=Path(__file__).parent)

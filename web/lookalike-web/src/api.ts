@@ -1,7 +1,6 @@
 export type CelebMatches = {
   name: string;
   similarity: number;
-  image: string;
 }[];
 
 export async function findMatches(data: string): Promise<CelebMatches> {

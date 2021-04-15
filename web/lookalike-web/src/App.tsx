@@ -63,6 +63,7 @@ const WebcamCapture = () => {
           component="span"
           onClick={() => {
             setImgSrc("");
+            setVal([]);
           }}
         >
           <ReplayIcon fontSize="large" />
@@ -77,10 +78,17 @@ const WebcamCapture = () => {
         </IconButton>
         <div>
           {val.map((result) => (
-            <div>
-              <img src={result.image} />
-              <span>
-                {result.name} ({result.similarity})
+            <div style={{ verticalAlign: "top", display: "inline-block" }}>
+              <img
+                width="200px"
+                src={encodeURI(
+                  "https://lookalike-manual.s3-ap-southeast-2.amazonaws.com/" +
+                    result.name +
+                    "/0.jpg"
+                )}
+              />
+              <span style={{ display: "block" }}>
+                {result.name} ({result.similarity.toFixed(1)})
               </span>
             </div>
           ))}
