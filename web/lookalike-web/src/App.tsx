@@ -1,4 +1,10 @@
 import React from "react";
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+  useHistory,
+} from "react-router-dom";
 import { makeStyles, createStyles, Theme } from "@material-ui/core/styles";
 import "./App.css";
 import { CelebMatches, findMatches } from "./api";
@@ -22,47 +28,55 @@ const useStyles = makeStyles((theme: Theme) =>
       },
       margin: "0px 10px",
     },
-    image: {
+    fullwidth: {
       width: "100%",
+    },
+    halfwidth: {
+      width: "50%",
     },
   })
 );
 
-const WebcamCapture = () => {
+interface imgState {
+  imgSrc: string;
+  setImgSrc: React.Dispatch<React.SetStateAction<string>>;
+}
+
+const WebcamCapture = (props: imgState) => {
   const classes = useStyles();
   const webcamRef = React.useRef(null);
-  const [imgSrc, setImgSrc] = React.useState<string>("");
+  let history = useHistory();
 
   const [val, setVal] = React.useState<CelebMatches>([]);
   React.useEffect(() => {
-    if (imgSrc === "") {
+    if (props.imgSrc === "") {
       return;
     }
 
-    findMatches(imgSrc.split(",")[1]).then((result) => {
+    findMatches(props.imgSrc.split(",")[1]).then((result) => {
       setVal(result);
     });
-  }, [imgSrc]);
+  }, [props.imgSrc]);
 
   const capture = React.useCallback(() => {
     if (webcamRef.current) {
       // TODO: figure out how to do this properly
       const imageSrc = (webcamRef.current! as any).getScreenshot();
-      setImgSrc(imageSrc);
+      props.setImgSrc(imageSrc);
     }
-  }, [webcamRef, setImgSrc]);
+  }, [webcamRef, props.setImgSrc]);
 
-  if (imgSrc !== "") {
+  if (props.imgSrc !== "") {
     return (
       <>
-        <img src={imgSrc} className={classes.image} alt="you" />
+        <img src={props.imgSrc} className={classes.fullwidth} alt="you" />
         <IconButton
           color="secondary"
           className={classes.button}
           aria-label="retake picture"
           component="span"
           onClick={() => {
-            setImgSrc("");
+            props.setImgSrc("");
             setVal([]);
           }}
         >
@@ -73,26 +87,12 @@ const WebcamCapture = () => {
           className={classes.button}
           aria-label="accept picture"
           component="span"
+          onClick={() => {
+            history.push("/results");
+          }}
         >
           <DoneIcon fontSize="large" />
         </IconButton>
-        <div>
-          {val.map((result) => (
-            <div style={{ verticalAlign: "top", display: "inline-block" }}>
-              <img
-                width="200px"
-                src={encodeURI(
-                  "https://lookalike-manual.s3-ap-southeast-2.amazonaws.com/" +
-                    result.name +
-                    "/0.jpg"
-                )}
-              />
-              <span style={{ display: "block" }}>
-                {result.name} ({result.similarity.toFixed(1)})
-              </span>
-            </div>
-          ))}
-        </div>
       </>
     );
   }
@@ -102,7 +102,7 @@ const WebcamCapture = () => {
       <Webcam
         audio={false}
         ref={webcamRef}
-        className={classes.image}
+        className={classes.fullwidth}
         screenshotFormat="image/jpeg"
         videoConstraints={{ facingMode: "user" }}
         mirrored={true}
@@ -121,13 +121,64 @@ const WebcamCapture = () => {
   );
 };
 
+interface ResultsProps {
+  imgSrc: string;
+}
+
+const Results = ({ imgSrc }: ResultsProps) => {
+  const classes = useStyles();
+  let history = useHistory();
+
+  const [matches, setMatches] = React.useState<CelebMatches>([]);
+  React.useEffect(() => {
+    if (imgSrc === "") {
+      history.push("/");
+    }
+
+    findMatches(imgSrc.split(",")[1]).then((result) => {
+      setMatches(result);
+    });
+  }, [imgSrc]);
+
+  return (
+    <div>
+      <img src={imgSrc} width="50%"  className={classes.halfwidth} alt="you" />
+      {matches.map((result) => (
+        <div style={{ verticalAlign: "top", display: "inline-block" }}>
+          <img
+            width="200px"
+            src={encodeURI(
+              "https://lookalike-manual.s3-ap-southeast-2.amazonaws.com/" +
+                result.name +
+                "/0.jpg"
+            )}
+          />
+          <span style={{ display: "block" }}>
+            {result.name} ({result.similarity.toFixed(2)})
+          </span>
+        </div>
+      ))}
+    </div>
+  );
+};
+
 function App() {
   const classes = useStyles();
+  const [imgSrc, setImgSrc] = React.useState<string>("");
 
   return (
     <div className="App">
       <div className={classes.container}>
-        <WebcamCapture />
+        <Router>
+          <Switch>
+            <Route path="/" exact>
+              <WebcamCapture imgSrc={imgSrc} setImgSrc={setImgSrc} />
+            </Route>
+            <Route path="/results">
+              <Results imgSrc={imgSrc} />
+            </Route>
+          </Switch>
+        </Router>
       </div>
     </div>
   );
