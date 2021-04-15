@@ -46,3 +46,10 @@ start-web:
 	npm --prefix web/lookalike-web start
 
 start: start-web start-api
+
+lint: setup infrastructure/aws/template.yaml
+	$(.venv)/bin/cfn-lint infrastructure/aws/template.yaml
+
+deploy-cfn:
+# TODO: deploy cfn template 
+	stackit up --template infrastructure/aws/template.yaml --stack-name lookalike --region ap-southeast-2
