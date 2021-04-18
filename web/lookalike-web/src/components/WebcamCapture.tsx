@@ -9,40 +9,34 @@ import DoneIcon from "@material-ui/icons/Done";
 import { useStyles } from "../Styles"; // must be imported last
 
 interface captureProps {
-  imgSrc: string;
-  setImgSrc: React.Dispatch<React.SetStateAction<string>>;
+  setFinalImg: React.Dispatch<React.SetStateAction<string>>;
 }
 
-export const WebcamCapture = ({ imgSrc, setImgSrc }: captureProps) => {
+export const WebcamCapture = ({ setFinalImg }: captureProps) => {
   const classes = useStyles();
   const webcamRef = React.useRef(null);
   let history = useHistory();
 
-  React.useEffect(() => {
-    if (imgSrc === "") {
-      return;
-    }
-  }, [imgSrc]);
+  const [localImg, setLocalImg] = React.useState<string>("");
 
   const capture = React.useCallback(() => {
     if (webcamRef.current) {
       // TODO: figure out how to do this properly
-      const imageSrc = (webcamRef.current! as any).getScreenshot();
-      setImgSrc(imageSrc);
+      setLocalImg((webcamRef.current! as any).getScreenshot());
     }
-  }, [webcamRef, setImgSrc]);
+  }, [webcamRef, setLocalImg]);
 
-  if (imgSrc !== "") {
+  if (localImg !== "") {
     return (
       <>
-        <img src={imgSrc} className={classes.fullwidth} alt="you" />
+        <img src={localImg} className={classes.fullwidth} alt="you" />
         <IconButton
           color="secondary"
           className={classes.button}
           aria-label="retake picture"
           component="span"
           onClick={() => {
-            setImgSrc("");
+            setLocalImg("");
           }}
         >
           <ReplayIcon fontSize="large" />
@@ -53,6 +47,7 @@ export const WebcamCapture = ({ imgSrc, setImgSrc }: captureProps) => {
           aria-label="accept picture"
           component="span"
           onClick={() => {
+            setFinalImg(localImg);
             history.push("/results");
           }}
         >
