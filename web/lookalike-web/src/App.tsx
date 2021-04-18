@@ -5,121 +5,9 @@ import {
   Route,
   useHistory,
 } from "react-router-dom";
-import { makeStyles, createStyles, Theme } from "@material-ui/core/styles";
-import "./App.css";
 import { CelebMatches, findMatches } from "./api";
-import Webcam from "react-webcam";
-import IconButton from "@material-ui/core/IconButton";
-import PhotoCamera from "@material-ui/icons/PhotoCamera";
-import ReplayIcon from "@material-ui/icons/Replay";
-import DoneIcon from "@material-ui/icons/Done";
-
-const useStyles = makeStyles((theme: Theme) =>
-  createStyles({
-    container: {
-      maxWidth: "1000px",
-      margin: "0 auto",
-    },
-    button: {
-      transform: "translateY(-120%)",
-      backgroundColor: "rgba(255, 255, 255, 0.7)",
-      "&:hover": {
-        backgroundColor: "rgba(255, 255, 255, 0.8)",
-      },
-      margin: "0px 10px",
-    },
-    fullwidth: {
-      width: "100%",
-    },
-    halfwidth: {
-      width: "50%",
-    },
-  })
-);
-
-interface imgState {
-  imgSrc: string;
-  setImgSrc: React.Dispatch<React.SetStateAction<string>>;
-}
-
-const WebcamCapture = (props: imgState) => {
-  const classes = useStyles();
-  const webcamRef = React.useRef(null);
-  let history = useHistory();
-
-  const [val, setVal] = React.useState<CelebMatches>([]);
-  React.useEffect(() => {
-    if (props.imgSrc === "") {
-      return;
-    }
-
-    findMatches(props.imgSrc.split(",")[1]).then((result) => {
-      setVal(result);
-    });
-  }, [props.imgSrc]);
-
-  const capture = React.useCallback(() => {
-    if (webcamRef.current) {
-      // TODO: figure out how to do this properly
-      const imageSrc = (webcamRef.current! as any).getScreenshot();
-      props.setImgSrc(imageSrc);
-    }
-  }, [webcamRef, props.setImgSrc]);
-
-  if (props.imgSrc !== "") {
-    return (
-      <>
-        <img src={props.imgSrc} className={classes.fullwidth} alt="you" />
-        <IconButton
-          color="secondary"
-          className={classes.button}
-          aria-label="retake picture"
-          component="span"
-          onClick={() => {
-            props.setImgSrc("");
-            setVal([]);
-          }}
-        >
-          <ReplayIcon fontSize="large" />
-        </IconButton>
-        <IconButton
-          color="primary"
-          className={classes.button}
-          aria-label="accept picture"
-          component="span"
-          onClick={() => {
-            history.push("/results");
-          }}
-        >
-          <DoneIcon fontSize="large" />
-        </IconButton>
-      </>
-    );
-  }
-
-  return (
-    <>
-      <Webcam
-        audio={false}
-        ref={webcamRef}
-        className={classes.fullwidth}
-        screenshotFormat="image/jpeg"
-        videoConstraints={{ facingMode: "user" }}
-        mirrored={true}
-        style={{ width: "100%" }}
-      />
-      <IconButton
-        color="primary"
-        className={classes.button}
-        aria-label="take picture"
-        component="span"
-        onClick={capture}
-      >
-        <PhotoCamera fontSize="large" />
-      </IconButton>
-    </>
-  );
-};
+import { WebcamCapture } from "./components/WebcamCapture";
+import { useStyles } from "./Styles"; // must be imported last
 
 interface ResultsProps {
   imgSrc: string;
@@ -142,7 +30,7 @@ const Results = ({ imgSrc }: ResultsProps) => {
 
   return (
     <div>
-      <img src={imgSrc} width="50%"  className={classes.halfwidth} alt="you" />
+      <img src={imgSrc} width="50%" className={classes.halfwidth} alt="you" />
       {matches.map((result) => (
         <div style={{ verticalAlign: "top", display: "inline-block" }}>
           <img
