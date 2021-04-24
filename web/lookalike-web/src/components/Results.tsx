@@ -1,9 +1,29 @@
 import React from "react";
 import { useHistory } from "react-router-dom";
 import IconButton from "@material-ui/core/IconButton";
+import { Paper, Button } from "@material-ui/core";
 import ReplayIcon from "@material-ui/icons/Replay";
+import Carousel from "react-material-ui-carousel";
 import { CelebMatches, findMatches } from "../api";
+import { getImageSrc } from "../external/celebImages";
 import { useStyles } from "../Styles"; // must be imported last
+
+interface MatchProps {
+  name: string;
+  similarity: number;
+  imgSrc: string;
+}
+
+function Match({ name, similarity, imgSrc }: MatchProps) {
+  return (
+    <div style={{ width: "400px" }}>
+      <img height="400px" src={imgSrc} />
+      <h3>
+        {name} ({similarity.toFixed(2)})
+      </h3>
+    </div>
+  );
+}
 
 interface ResultsProps {
   imgSrc: string;
@@ -26,33 +46,44 @@ export const Results = ({ imgSrc }: ResultsProps) => {
   }, [history, imgSrc]);
 
   return (
-    <div>
-      <img src={imgSrc} width="50%" className={classes.halfwidth} alt="you" />
-      <IconButton
+    <>
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "row",
+          justifyContent: "center",
+        }}
+      >
+        <img src={imgSrc} height="400px" alt="you" />
+        <Carousel
+          autoPlay={false}
+          navButtonsAlwaysVisible={true}
+          animation="slide"
+          timeout={100}
+        >
+          {matches.map((match, i) => (
+            <Match
+              key={i}
+              name={match.name}
+              similarity={match.similarity}
+              imgSrc={getImageSrc(match.name)}
+            />
+          ))}
+        </Carousel>
+      </div>
+      <h2>Don't think any of them look like you?</h2>
+      <Button
         color="primary"
+        variant="contained"
         aria-label="retake picture"
         component="span"
         onClick={() => {
           history.push("/");
         }}
+        startIcon={<ReplayIcon />}
       >
-        <ReplayIcon fontSize="large" />
-      </IconButton>
-      {matches.map((result) => (
-        <div style={{ verticalAlign: "top", display: "inline-block" }}>
-          <img
-            width="200px"
-            src={encodeURI(
-              "https://lookalike-manual.s3-ap-southeast-2.amazonaws.com/" +
-                result.name +
-                "/0.jpg"
-            )}
-          />
-          <span style={{ display: "block" }}>
-            {result.name} ({result.similarity.toFixed(2)})
-          </span>
-        </div>
-      ))}
-    </div>
+        Try again
+      </Button>
+    </>
   );
 };
