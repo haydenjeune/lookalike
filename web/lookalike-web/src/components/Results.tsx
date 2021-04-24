@@ -37,11 +37,18 @@ export const Results = ({ imgSrc }: ResultsProps) => {
     if (imgSrc === "") {
       // redirect to capture page if there's no image
       history.push("/");
+      return;
     }
 
-    findMatches(imgSrc.split(",")[1]).then((result) => {
-      setMatches(result);
-    });
+    findMatches(imgSrc.split(",")[1]).then(
+      (result) => {
+        setMatches(result);
+      },
+      (error) => {
+        alert("Error fetching from matches API");
+        history.push("/");
+      }
+    );
   }, [history, imgSrc]);
 
   return (
