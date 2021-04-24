@@ -23,5 +23,10 @@ export const useStyles = makeStyles((theme: Theme) =>
     halfwidth: {
       width: "50%",
     },
+    flexRowCentered: {
+      display: "flex",
+      flexDirection: "row",
+      justifyContent: "center",
+    },
   })
 );

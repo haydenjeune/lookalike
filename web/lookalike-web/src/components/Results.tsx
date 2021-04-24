@@ -1,10 +1,9 @@
 import React from "react";
 import { useHistory } from "react-router-dom";
-import IconButton from "@material-ui/core/IconButton";
-import { Paper, Button } from "@material-ui/core";
+import { Button } from "@material-ui/core";
 import ReplayIcon from "@material-ui/icons/Replay";
 import Carousel from "react-material-ui-carousel";
-import { CelebMatches, findMatches } from "../api";
+import { CelebMatches, findMatches } from "../external/api";
 import { getImageSrc } from "../external/celebImages";
 import { useStyles } from "../Styles"; // must be imported last
 
@@ -47,13 +46,7 @@ export const Results = ({ imgSrc }: ResultsProps) => {
 
   return (
     <>
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "row",
-          justifyContent: "center",
-        }}
-      >
+      <div className={classes.flexRowCentered}>
         <img src={imgSrc} height="400px" alt="you" />
         <Carousel
           autoPlay={false}
