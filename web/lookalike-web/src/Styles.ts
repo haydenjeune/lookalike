@@ -28,5 +28,8 @@ export const useStyles = makeStyles((theme: Theme) =>
       flexDirection: "row",
       justifyContent: "center",
     },
+    navBottomMargin: {
+      marginBottom: "20px"
+    }
   })
 );
