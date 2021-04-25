@@ -1,0 +1,4 @@
+files(
+  sources=["**/*"],
+  name="assets",
+)
