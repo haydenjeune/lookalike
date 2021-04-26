@@ -10,6 +10,18 @@ from index.predictor import FaceNetDotProductPredictor
 
 
 @pytest.fixture()
+def predict_response():
+    return [{"name": "Justin Bieber", "similarity": 0.5}]
+
+
+@pytest.fixture()
+def predictor(mocker, predict_response):
+    mocker.patch(
+        "api.app.FaceNetDotProductPredictor.predict", return_value=predict_response
+    )
+
+
+@pytest.fixture()
 def non_b64_jpg_data():
     with open("tests/assets/my-profile.jpeg", "rb") as f:
         return f.read()
@@ -48,3 +60,9 @@ def test_post_throws_exception_with_decompression_bomb(decompression_bomb_data):
     with pytest.raises(ProblemException) as e:
         app.find_lookalike(decompression_bomb_data)
     assert e.value.status == 422
+
+
+def test_post(predictor, b64_jpg_data, predict_response):
+    response = app.find_lookalike(b64_jpg_data)
+    assert response[0] == predict_response
+    assert response[1] == 200
