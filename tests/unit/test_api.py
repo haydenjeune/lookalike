@@ -4,11 +4,12 @@ from connexion import ProblemException
 import pytest
 
 import api.app as app
+from index.predictor import Result
 
 
 @pytest.fixture()
 def prediction():
-    return [{"name": "Justin Bieber", "similarity": 0.5}]
+    return [Result("Justin Bieber", 0.5)]
 
 
 @pytest.fixture()
@@ -73,19 +74,16 @@ def test_post_throws_exception_with_decompression_bomb(decompression_bomb_data):
     assert e.value.status == 422
 
 
-def test_post_jpeg(predictor, b64_jpg_data, prediction):
+def test_post_jpeg(predictor, prediction, b64_jpg_data):
     response = app.find_lookalike(b64_jpg_data)
-    assert response[0] == prediction
-    assert response[1] == 200
+    assert response == (prediction, 200)
 
 
-def test_post_png(predictor, b64_png_data, prediction):
+def test_post_png(predictor, prediction, b64_png_data):
     response = app.find_lookalike(b64_png_data)
-    assert response[0] == prediction
-    assert response[1] == 200
+    assert response == (prediction, 200)
 
 
 def test_post_no_prediction(empty_predictor, b64_png_data):
     response = app.find_lookalike(b64_png_data)
-    assert response[0] == []
-    assert response[1] == 200
+    assert response == ([], 200)
