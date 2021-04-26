@@ -1,24 +1,24 @@
-import pytest
-import mock
-from PIL import Image
-from io import BytesIO
-from pathlib import Path
 from base64 import b64encode
-import api.app as app
+
 from connexion import ProblemException
-from index.predictor import FaceNetDotProductPredictor
+import pytest
+
+import api.app as app
 
 
 @pytest.fixture()
-def predict_response():
+def prediction():
     return [{"name": "Justin Bieber", "similarity": 0.5}]
 
 
 @pytest.fixture()
-def predictor(mocker, predict_response):
-    mocker.patch(
-        "api.app.FaceNetDotProductPredictor.predict", return_value=predict_response
-    )
+def predictor(mocker, prediction):
+    mocker.patch("api.app.FaceNetDotProductPredictor.predict", return_value=prediction)
+
+
+@pytest.fixture()
+def empty_predictor(mocker):
+    mocker.patch("api.app.FaceNetDotProductPredictor.predict", return_value=[])
 
 
 @pytest.fixture()
@@ -30,6 +30,17 @@ def non_b64_jpg_data():
 @pytest.fixture()
 def b64_jpg_data(non_b64_jpg_data):
     return b64encode(non_b64_jpg_data)
+
+
+@pytest.fixture()
+def non_b64_png_data():
+    with open("tests/assets/1x1.png", "rb") as f:
+        return f.read()
+
+
+@pytest.fixture()
+def b64_png_data(non_b64_png_data):
+    return b64encode(non_b64_png_data)
 
 
 @pytest.fixture()
@@ -62,7 +73,19 @@ def test_post_throws_exception_with_decompression_bomb(decompression_bomb_data):
     assert e.value.status == 422
 
 
-def test_post(predictor, b64_jpg_data, predict_response):
+def test_post_jpeg(predictor, b64_jpg_data, prediction):
     response = app.find_lookalike(b64_jpg_data)
-    assert response[0] == predict_response
+    assert response[0] == prediction
+    assert response[1] == 200
+
+
+def test_post_png(predictor, b64_png_data, prediction):
+    response = app.find_lookalike(b64_png_data)
+    assert response[0] == prediction
+    assert response[1] == 200
+
+
+def test_post_no_prediction(empty_predictor, b64_png_data):
+    response = app.find_lookalike(b64_png_data)
+    assert response[0] == []
     assert response[1] == 200
