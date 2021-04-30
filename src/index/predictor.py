@@ -1,14 +1,15 @@
 from abc import ABC, abstractmethod, abstractstaticmethod
-from typing import List, Optional, Type
+from typing import Any, Callable, List, Type, TypeVar
 from dataclasses import dataclass, field
+from random import randrange
 
 from PIL import Image
-from facenet_pytorch import MTCNN, InceptionResnetV1
-from torch import no_grad
-from numpy import ndarray, dot
+from numpy import ndarray, dot, add
 
 from index.builder import FaceNetPyTorchImageVectoriser, ImageVectoriser
 from index.storage import VectorIndex
+
+T = TypeVar("T")
 
 
 class FaceNotFound(Exception):
@@ -22,7 +23,8 @@ class Result:
 
 
 class Comparator(ABC):
-    @abstractstaticmethod
+    @staticmethod
+    @abstractmethod
     def compare(l: ndarray, r: ndarray) -> float:
         raise NotImplementedError()
 
@@ -35,7 +37,7 @@ class DotProductComparator(Comparator):
 
     @staticmethod
     def compare(l: ndarray, r: ndarray) -> float:
-        return (dot(l, r) + 1) / 2
+        return add(dot(l, r), 1) / 2
 
 
 @dataclass
@@ -61,7 +63,6 @@ class FaceNetDotProductPredictor(Predictor):
     def predict(self, image: Image.Image) -> List[Result]:
         img_vec = self.vectoriser.vectorise(image)
         if img_vec is None:
-            # TODO: do this properly
             return []
 
         similarities = [
@@ -72,3 +73,46 @@ class FaceNetDotProductPredictor(Predictor):
         similarities.sort(key=lambda x: x[0], reverse=True)
 
         return [Result(name, score) for score, name in similarities[: self.num_results]]
+
+
+def top_k(items: List[T], k: int, key: Callable[[T], float]):
+    # use quickselect variant to get average case O(n) selection of k items where n=len(items)
+    # https://en.wikipedia.org/wiki/Quickselect
+    left = 0
+    right = len(items) - 1
+
+    while True:
+        pivot_index = randrange(left, right)
+        pivot_index = partition(items, left, right, pivot_index, key)
+
+        if pivot_index in {k, k - 1}:
+            return items[:k]
+        elif pivot_index > k:
+            right = pivot_index - 1
+        elif pivot_index < k - 1:
+            left = pivot_index + 1
+
+
+def partition(
+    items: List[T],
+    left: int,
+    right: int,
+    pivot_index: int,
+    key: Callable[[T], float],
+):
+    pivot_value = key(items[pivot_index])
+
+    # swap pivot element to end
+    items[pivot_index], items[right] = items[right], items[pivot_index]
+
+    store_index = left
+
+    for i in range(left, right):
+        if key(items[i]) > pivot_value:
+            items[store_index], items[i] = items[i], items[store_index]
+            store_index += 1
+
+    # swap pivot back to partition boundary
+    items[store_index], items[right] = items[right], items[store_index]
+
+    return store_index
