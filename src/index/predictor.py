@@ -65,23 +65,31 @@ class FaceNetDotProductPredictor(Predictor):
         if img_vec is None:
             return []
 
-        similarities = [
+        all_similarities = [
             (self.comparator.compare(img_vec, celeb_vec), name)
             for name, celeb_vec in self.index.vectors
         ]
-        # TODO: there are more efficient ways to do this
-        similarities.sort(key=lambda x: x[0], reverse=True)
 
-        return [Result(name, score) for score, name in similarities[: self.num_results]]
+        top_similarities = top_k(
+            all_similarities, k=self.num_results, key=lambda x: x[0]
+        )
+
+        return [Result(name, score) for score, name in top_similarities]
 
 
 def top_k(items: List[T], k: int, key: Callable[[T], float]):
     # use quickselect variant to get average case O(n) selection of k items where n=len(items)
     # https://en.wikipedia.org/wiki/Quickselect
+    if k > len(items):
+        return items
+
     left = 0
     right = len(items) - 1
 
     while True:
+        if left == right:
+            return items[:k]
+
         pivot_index = randrange(left, right)
         pivot_index = partition(items, left, right, pivot_index, key)
 
