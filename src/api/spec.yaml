@@ -32,10 +32,6 @@ paths:
             schema:
               type: string
               format: base64
-          image/png:
-            schema:
-              type: string
-              format: base64
       responses:
         200:
           description: A set of celebrities that the given picture looks like.
