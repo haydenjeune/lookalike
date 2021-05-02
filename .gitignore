@@ -3,9 +3,14 @@
 .ipynb_checkpoints
 __pycache__
 .DS_Store
+.batect
 
 # Pants workspace files
 /.pants.d/
 /dist/
 /.pids
 /.pants.workdir.file_lock*
+.cache
+
+# Local celebdb
+.celebstore
