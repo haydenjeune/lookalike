@@ -1,0 +1,7 @@
+.ipynb_checkpoints
+.pants.d
+.pids
+.pytest_cache
+.venv
+.vscode
+**/node_modules
