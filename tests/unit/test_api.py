@@ -34,17 +34,6 @@ def b64_jpg_data(non_b64_jpg_data):
 
 
 @pytest.fixture()
-def non_b64_png_data():
-    with open("tests/assets/1x1.png", "rb") as f:
-        return f.read()
-
-
-@pytest.fixture()
-def b64_png_data(non_b64_png_data):
-    return b64encode(non_b64_png_data)
-
-
-@pytest.fixture()
 def b64_non_image_data():
     return b64encode(b"abcdefghijklmnopqrstuvwxyz")
 
@@ -79,11 +68,6 @@ def test_post_jpeg(predictor, prediction, b64_jpg_data):
     assert response == (prediction, 200)
 
 
-def test_post_png(predictor, prediction, b64_png_data):
-    response = app.find_lookalike(b64_png_data)
-    assert response == (prediction, 200)
-
-
-def test_post_no_prediction(empty_predictor, b64_png_data):
-    response = app.find_lookalike(b64_png_data)
+def test_post_no_prediction(empty_predictor, b64_jpg_data):
+    response = app.find_lookalike(b64_jpg_data)
     assert response == ([], 200)
