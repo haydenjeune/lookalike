@@ -8,7 +8,7 @@ from orchestration.base import Orchestrator
 @dataclass
 class LocalListDownloader(Orchestrator):
     url: str = r"https://raw.githubusercontent.com/prateekmehta59/Celebrity-Face-Recognition-Dataset/master/List%20of%20Celebrities"
-    storage_path: str = "/Users/hayden.jeune/.celebstore"
+    storage_path: str = ".celebstore"
 
     def run(self):
         finder = UrlCelebrityListFinder(list_url=self.url)

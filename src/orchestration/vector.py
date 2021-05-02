@@ -17,7 +17,7 @@ log = getLogger(__name__)
 
 @dataclass
 class ImagePreProcessing(Orchestrator):
-    storage_path: str = "/Users/hayden.jeune/.celebstore"
+    storage_path: str = ".celebstore"
 
     def run(self):
         celeb_storage = LocalCelebrityStorage(self.storage_path)
