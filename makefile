@@ -39,11 +39,20 @@ setup: $(.venv) $(requirements.txt)
 test:
 	./pants test tests/unit::
 
-start-api: setup
+build-api: setup
+	./pants package src/api
+
+build-worker: setup
+	./pants package src/worker
+
+start-api: build-api
 	./pants run src/api
 
 start-web:
 	npm --prefix web/lookalike-web start
+
+start-worker: build-worker
+	./pants run src/worker
 
 start: start-web start-api
 
