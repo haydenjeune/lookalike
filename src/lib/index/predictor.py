@@ -6,8 +6,8 @@ from random import randrange
 from PIL import Image
 from numpy import ndarray, dot, add
 
-from index.builder import FaceNetPyTorchImageVectoriser, ImageVectoriser
-from index.storage import VectorIndex
+from lib.index.builder import FaceNetPyTorchImageVectoriser, ImageVectoriser
+from lib.index.storage import VectorIndex
 
 T = TypeVar("T")
 

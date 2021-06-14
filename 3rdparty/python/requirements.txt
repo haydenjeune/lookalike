@@ -4,8 +4,14 @@
 #
 #    pip-compile --output-file=3rdparty/python/requirements.txt requirements.in
 #
+--index-url https://pypi.python.org/simple
+
 anyio==2.2.0
     # via jupyter-server
+appnope==0.1.2
+    # via
+    #   ipykernel
+    #   ipython
 argon2-cffi==20.1.0
     # via
     #   jupyter-server
@@ -192,6 +198,7 @@ numpy==1.19.5
     #   -r requirements.in
     #   facenet-pytorch
     #   matplotlib
+    #   pyarrow
     #   torch
     #   torchvision
 openapi-schema-validator==0.1.5
@@ -237,6 +244,8 @@ ptyprocess==0.7.0
     #   terminado
 py==1.10.0
     # via pytest
+pyarrow==4.0.1
+    # via -r requirements.in
 pycparser==2.20
     # via cffi
 pyfakefs==4.4.0

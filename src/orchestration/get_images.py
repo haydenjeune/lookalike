@@ -1,9 +1,9 @@
 from dataclasses import dataclass
 from tqdm import tqdm
 
-from image.storage import LocalImageStorage
-from celebrity.storage import LocalCelebrityStorage
-from image.retrieve import ImageRetrieverException, WikipediaImageRetriever
+from lib.image.storage import LocalImageStorage
+from lib.celebrity.storage import LocalCelebrityStorage
+from lib.image.retrieve import ImageRetrieverException, WikipediaImageRetriever
 from orchestration.base import Orchestrator
 
 

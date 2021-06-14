@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 
-from celebrity.finder import UrlCelebrityListFinder
-from celebrity.storage import LocalCelebrityStorage
+from lib.celebrity.finder import UrlCelebrityListFinder
+from lib.celebrity.storage import LocalCelebrityStorage
 from orchestration.base import Orchestrator
 
 

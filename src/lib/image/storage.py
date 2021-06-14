@@ -15,7 +15,19 @@ class ImageNotFound(LocalImageStorageException):
 
 class ImageStorage(ABC):
     @abstractmethod
-    def persist(self, celebrities: List[str]):
+    def persist(self, celebrity_name: str, key: str, image: Image.Image):
+        pass
+
+    @abstractmethod
+    def retrieve(self, celebrity_name: str, key: str) -> Image.Image:
+        pass
+
+    @abstractmethod
+    def retrieve_all(self, celebrity_name: str) -> List[Image.Image]:
+        pass
+
+    @abstractmethod
+    def exists(self, celebrity_name: str, key: str) -> bool:
         pass
 
 
@@ -42,7 +54,7 @@ class LocalImageStorage(ImageStorage):
 
         try:
             with open(self._get_filepath(celebrity_name, key), "wb") as f:
-                image.convert("RGB").save(f, format="jpeg")
+                image.save(f, format="jpeg")
         except OSError as e:
             raise LocalImageStorageException("Failed to write to image file") from e
 

@@ -8,8 +8,8 @@ from flask_cors import CORS
 from PIL import Image, UnidentifiedImageError
 
 from api import configuration
-from index.predictor import FaceNetDotProductPredictor
-from index.storage import VectorIndex
+from lib.index.predictor import FaceNetDotProductPredictor
+from lib.index.storage import VectorIndex
 
 config = configuration.get()
 predictor = FaceNetDotProductPredictor(index=VectorIndex(config.vector_index_filepath))

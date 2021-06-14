@@ -35,7 +35,7 @@ class InvalidImagePageException(ImageRetrieverException):
 
 class ImageRetriever(ABC):
     @abstractmethod
-    def retrieve(self, name: str) -> Image:
+    def retrieve(self, name: str, max_images=None) -> Iterable[Image.Image]:
         pass
 
 
@@ -50,22 +50,29 @@ class WikipediaImageRetriever(ImageRetriever):
     _url: str = "https://en.wikipedia.org"
     _page_stem: str = "/wiki/"
 
-    def retrieve(self, name: str) -> Iterable[Image.Image]:
+    def retrieve(self, name: str, max_images=None) -> Iterable[Image.Image]:
         resp = requests.get(self._url + self._page_stem + self._encode_name(name))
         if resp.status_code == 404:
             raise NoPageException(f"No main page found at {resp.url}")
 
         image_page_urls = self._find_image_page_urls(resp.text)
 
+        retrieved = 0
         for url in image_page_urls:
+            if max_images and retrieved >= max_images:
+                return
+
             resp = requests.get(url)
             if resp.status_code == 404:
                 log.warning(f"HTTP 404, couldn't get {url}")
             else:
                 try:
                     image_url = self._find_full_image_url(resp.text)
+                    if image_url.split(".")[-1].lower() not in {"png", "jpg", "jpeg"}:
+                        continue
                     resp = requests.get(image_url, stream=True)
-                    yield Image.open(io.BytesIO(resp.content))
+                    retrieved += 1
+                    yield Image.open(io.BytesIO(resp.content)).convert("RGB")
                 except UnidentifiedImageError as e:
                     log.exception(f" {url}", exc_info=e)
                 except ImageRetrieverException as e:
@@ -80,7 +87,7 @@ class WikipediaImageRetriever(ImageRetriever):
 
         image_links = page.find_all("a", {"class": "image"})
         if len(image_links) == 0:
-            raise StopIteration()
+            return
 
         for link in image_links:
             image_page_url = link["href"]

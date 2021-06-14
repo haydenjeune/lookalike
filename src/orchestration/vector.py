@@ -1,13 +1,13 @@
 from dataclasses import dataclass
 from logging import getLogger
 
-from celebrity.storage import LocalCelebrityStorage
-from image.storage import LocalImageStorage
-from index.builder import (
+from lib.celebrity.storage import LocalCelebrityStorage
+from lib.image.storage import LocalImageStorage
+from lib.index.builder import (
     FaceNetPyTorchImageVectoriser,
     MedianVectorAggregator,
 )
-from index.storage import VectorIndex
+from lib.index.storage import VectorIndex
 from orchestration.base import Orchestrator
 
 from tqdm import tqdm
