@@ -4,32 +4,18 @@ import io
 import logging
 from sys import exc_info
 from urllib.parse import quote
-from typing import Iterable
+from typing import Iterable, Optional
 
 from bs4 import BeautifulSoup
 from PIL import Image, UnidentifiedImageError
 import requests
+from loguru import logger
 
-log = logging.getLogger(__name__)
+
+VALID_EXTENSIONS = {"png", "jpg", "jpeg"}
 
 
 class ImageRetrieverException(Exception):
-    pass
-
-
-class NoPageException(ImageRetrieverException):
-    pass
-
-
-class NoImageException(ImageRetrieverException):
-    pass
-
-
-class InvalidInfoBoxException(ImageRetrieverException):
-    pass
-
-
-class InvalidImagePageException(ImageRetrieverException):
     pass
 
 
@@ -53,7 +39,7 @@ class WikipediaImageRetriever(ImageRetriever):
     def retrieve(self, name: str, max_images=None) -> Iterable[Image.Image]:
         resp = requests.get(self._url + self._page_stem + self._encode_name(name))
         if resp.status_code == 404:
-            raise NoPageException(f"No main page found at {resp.url}")
+            raise ImageRetrieverException(f"No main page found at {resp.url}")
 
         image_page_urls = self._find_image_page_urls(resp.text)
 
@@ -64,19 +50,20 @@ class WikipediaImageRetriever(ImageRetriever):
 
             resp = requests.get(url)
             if resp.status_code == 404:
-                log.warning(f"HTTP 404, couldn't get {url}")
+                logger.error(f"HTTP 404, couldn't get {url}")
             else:
                 try:
                     image_url = self._find_full_image_url(resp.text)
-                    if image_url.split(".")[-1].lower() not in {"png", "jpg", "jpeg"}:
+                    if (
+                        not image_url
+                        or image_url.split(".")[-1].lower() not in VALID_EXTENSIONS
+                    ):
                         continue
                     resp = requests.get(image_url, stream=True)
                     retrieved += 1
                     yield Image.open(io.BytesIO(resp.content)).convert("RGB")
                 except UnidentifiedImageError as e:
-                    log.exception(f" {url}", exc_info=e)
-                except ImageRetrieverException as e:
-                    log.exception(f"Failed to get main image from {url}", exc_info=e)
+                    logger.warning(f"Received bad image data for {url}", exc_info=e)
 
     @staticmethod
     def _encode_name(name: str) -> str:
@@ -99,11 +86,11 @@ class WikipediaImageRetriever(ImageRetriever):
             yield image_page_url
 
     @staticmethod
-    def _find_full_image_url(html: str) -> str:
+    def _find_full_image_url(html: str) -> Optional[str]:
         page = BeautifulSoup(html, "html.parser")
         divs = page.find_all("div", {"class": "fullImageLink", "id": "file"})
-        if len(divs) != 1:
-            raise InvalidImagePageException("Expected a single main image")
+        if len(divs) == 0:
+            return None
 
         image_url = divs[0].a["href"]
         # check scheme has been specified, sometimes wikipedia specifies it like //host.com/image.jpg
