@@ -5,6 +5,7 @@ from PIL import Image
 from facenet_pytorch import MTCNN, InceptionResnetV1
 from torch import no_grad
 from numpy import ndarray, array, median
+from numpy.linalg import norm
 
 
 class FaceNotFound(Exception):
@@ -43,5 +44,5 @@ class VectorAggregator(ABC):
 
 class MedianVectorAggregator(VectorAggregator):
     def aggregate(self, vectors: List[ndarray]) -> ndarray:
-        combined = array(vectors)
-        return median(combined, axis=0)
+        combined = median(array(vectors), axis=0)
+        return combined / norm(combined)

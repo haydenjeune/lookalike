@@ -10,8 +10,8 @@ class Config:
     MAXIMUM_IMAGE_PIXELS = environ.var(
         name="MAXIMUM_IMAGE_PIXELS", default="5000000", converter=int
     )
-    MAX_IMAGES_PER_PERSON = environ.var(
-        name="MAX_IMAGES_PER_PERSON", default="3", converter=int
+    MAX_VECTORS_PER_PERSON = environ.var(
+        name="MAX_VECTORS_PER_PERSON", default="3", converter=int
     )
 
 
