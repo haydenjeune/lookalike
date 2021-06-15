@@ -82,7 +82,14 @@ name_to_path_translation = str.maketrans("", "", punctuation + whitespace)
 
 class FsVectorStorage(VectorStorage):
     def __init__(self, root: str):
+        self._validate_root(root)
         self.root = root
+
+    @staticmethod
+    def _validate_root(root: str):
+        scheme = root.split("://")[0]
+        if "://" not in root or scheme not in {"s3", "memory", "file"}:
+            raise ValueError(f"Invalid file system scheme {scheme}")
 
     def persist(self, celebrity_name: str, vector: ndarray):
         path = (

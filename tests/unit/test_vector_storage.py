@@ -1,5 +1,6 @@
 from fsspec.implementations.memory import MemoryFileSystem
 import numpy as np
+import pytest
 
 from lib.index.storage import FsVectorStorage
 
@@ -20,3 +21,9 @@ def test_retrieve_without_persist():
     read_data = sut.retrieve("Sally Britty")
 
     assert read_data is None
+
+
+@pytest.mark.parametrize("root", ["invalid://test", "test"])
+def test_fsvectorstorage_with_invalid_scheme(root):
+    with pytest.raises(ValueError):
+        sut = FsVectorStorage(root)
