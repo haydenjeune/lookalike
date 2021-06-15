@@ -76,6 +76,8 @@ flask==1.1.2
     # via
     #   connexion
     #   flask-cors
+fsspec==2021.6.0
+    # via -r requirements.in
 idna==2.10
     # via
     #   anyio

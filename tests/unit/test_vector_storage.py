@@ -1,0 +1,22 @@
+from fsspec.implementations.memory import MemoryFileSystem
+import numpy as np
+
+from lib.index.storage import FsVectorStorage
+
+
+def test_retrieve_after_persist():
+    data = np.array([1, 2, 3, 4])
+    sut = FsVectorStorage("memory://test")
+
+    sut.persist("Sally Britty", data)
+    read_data = sut.retrieve("Sally Britty")
+
+    assert (data == read_data).all()
+
+
+def test_retrieve_without_persist():
+    sut = FsVectorStorage("memory://test")
+
+    read_data = sut.retrieve("Sally Britty")
+
+    assert read_data is None
