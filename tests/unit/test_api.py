@@ -4,7 +4,7 @@ from connexion import ProblemException
 import pytest
 
 import api.app as app
-from index.predictor import Result
+from lib.index.predictor import Result
 
 
 @pytest.fixture()

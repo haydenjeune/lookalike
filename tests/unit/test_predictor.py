@@ -5,9 +5,9 @@ import numpy as np
 import pytest
 from PIL.Image import Image
 
-from index.builder import FaceNetPyTorchImageVectoriser
-from index.predictor import top_k, FaceNetDotProductPredictor
-from index.storage import VectorIndex
+from lib.index.builder import FaceNetPyTorchImageVectoriser
+from lib.index.predictor import top_k, FaceNetDotProductPredictor
+from lib.index.storage import VectorIndex
 
 # run multiple times to catch randomness
 @pytest.mark.parametrize("execution_number", range(100))
