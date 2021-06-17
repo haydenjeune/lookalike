@@ -1,5 +1,3 @@
-from os import read
-import numpy as np
 import pytest
 from mock import patch
 from io import BytesIO

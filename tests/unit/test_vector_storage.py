@@ -1,4 +1,3 @@
-from fsspec.implementations.memory import MemoryFileSystem
 import numpy as np
 import pytest
 
