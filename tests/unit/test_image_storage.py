@@ -30,6 +30,18 @@ def test_exists_after_persist():
 
     assert sut.exists("Sally Britty 2", "key") == True
 
+def test_duplicate_persist():
+    sut = FsImageStorage("memory://test")
+    with open("tests/assets/my-profile.jpeg", "rb") as f:
+        img = Image.open(f)
+        img.load()
+    sut.persist("Sally Britty 2.1", "key", img)
+
+    new_img = img.crop((0,0,10,10))
+    sut.persist("Sally Britty 2.1", "key", new_img)
+    read_data = sut.retrieve("Sally Britty 2.1", "key")
+
+    assert new_img.size == read_data.size
 
 def test_retrieve_without_persist():
     sut = FsImageStorage("memory://test")
