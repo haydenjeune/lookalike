@@ -4,11 +4,9 @@ import os
 
 @environ.config()
 class Config:
-    VECTOR_INDEX_FILEPATH = environ.var(
-        name="VECTOR_INDEX_FILEPATH", default="/Users/hayden.jeune/.celebstore/vec"
-    )
-    MAXIMUM_IMAGE_PIXELS = environ.var(
-        name="MAXIMUM_IMAGE_PIXELS", default="5000000", converter=int
+    VECTOR_STORAGE_ROOT = environ.var(
+        name="VECTOR_STORAGE_ROOT",
+        default="file:///Users/hayden.jeune/.celebstore/worker",
     )
     MAX_VECTORS_PER_PERSON = environ.var(
         name="MAX_VECTORS_PER_PERSON", default="3", converter=int

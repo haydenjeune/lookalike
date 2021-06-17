@@ -3,12 +3,10 @@ from dataclasses import dataclass
 from json.decoder import JSONDecodeError
 from pathlib import Path
 from string import punctuation, whitespace
-from typing import Dict, Iterable, List, Optional, Union, Tuple
+from typing import Dict, List, Optional, Union, Tuple
 import json
-from urllib.parse import urlparse
 
 from fsspec import open as fsspec_open
-from fsspec.spec import AbstractFileSystem
 from numpy import ndarray, array, save, load
 
 

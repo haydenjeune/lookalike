@@ -9,8 +9,8 @@ def test_retrieve_after_persist():
     data = np.array([1, 2, 3, 4])
     sut = FsVectorStorage("memory://test")
 
-    sut.persist("Sally Britty", data)
-    read_data = sut.retrieve("Sally Britty")
+    sut.persist("Sally Britty 1", data)
+    read_data = sut.retrieve("Sally Britty 1")
 
     assert (data == read_data).all()
 
@@ -18,7 +18,7 @@ def test_retrieve_after_persist():
 def test_retrieve_without_persist():
     sut = FsVectorStorage("memory://test")
 
-    read_data = sut.retrieve("Sally Britty")
+    read_data = sut.retrieve("Sally Britty 2")
 
     assert read_data is None
 

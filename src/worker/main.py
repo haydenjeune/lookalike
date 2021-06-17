@@ -13,6 +13,10 @@ from lib.index.builder import (
     VectorAggregator,
     MedianVectorAggregator,
 )
+from lib.index.storage import (
+    VectorStorage,
+    FsVectorStorage,
+)
 
 
 config = get_config()
@@ -24,10 +28,12 @@ class ImageProcessor:
         image_retriever: ImageRetriever,
         image_vectoriser: ImageVectoriser,
         vector_aggregator: VectorAggregator,
+        vector_storage: VectorStorage,
     ) -> None:
         self.image_retriever = image_retriever
         self.image_vectoriser = image_vectoriser
         self.vector_aggregator = vector_aggregator
+        self.vector_storage = vector_storage
 
     def process(self, name: str):
         """Stores a key image and a face vector given a celebrities name
@@ -56,15 +62,17 @@ class ImageProcessor:
         aggregated_vector = self.vector_aggregator.aggregate(vectors)
         # TODO: some quality checks?
 
+        self.vector_storage.persist(name, aggregated_vector)
+
         logger.info(f"{aggregated_vector[:5]}")
 
 
 def main():
-
     processor = ImageProcessor(
         WikipediaImageRetriever(),
         FaceNetPyTorchImageVectoriser(),
         MedianVectorAggregator(),
+        FsVectorStorage(config.VECTOR_STORAGE_ROOT),
     )
 
     with open("/Users/hayden.jeune/Downloads/name.basics.tsv") as file:
