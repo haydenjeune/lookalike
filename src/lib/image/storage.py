@@ -50,7 +50,6 @@ class FsImageStorage(ImageStorage):
 
     def persist(self, celebrity_name: str, key: str, image: Image.Image):
         path = self._build_path(celebrity_name, key, FsImageStorage.STORAGE_FORMAT)
-        print(path)
         with fsspec_open(path, "wb") as f:
             image.save(f, FsImageStorage.STORAGE_FORMAT)
 

@@ -1,12 +1,14 @@
 import csv
+from PIL import Image
 from loguru import logger
+from lib.image.storage import FsImageStorage, ImageStorage
 
 from worker.configuration import get_config
 from lib.image.retrieve import (
     ImageRetriever,
-    ImageRetrieverException,
     WikipediaImageRetriever,
 )
+from lib.image.convert import ImageResizer
 from lib.index.builder import (
     ImageVectoriser,
     FaceNetPyTorchImageVectoriser,
@@ -27,11 +29,15 @@ class ImageProcessor:
         self,
         image_retriever: ImageRetriever,
         image_vectoriser: ImageVectoriser,
+        image_resizer: ImageResizer,
+        image_storage: ImageStorage,
         vector_aggregator: VectorAggregator,
         vector_storage: VectorStorage,
     ) -> None:
         self.image_retriever = image_retriever
         self.image_vectoriser = image_vectoriser
+        self.image_resizer = image_resizer
+        self.image_storage = image_storage
         self.vector_aggregator = vector_aggregator
         self.vector_storage = vector_storage
 
@@ -52,6 +58,11 @@ class ImageProcessor:
             if vector is None:
                 continue
 
+            # store the first image with a face as the key image
+            if len(vectors) == 0:
+                web_image = self.image_resizer.convert(image)
+                self.image_storage.persist(name, config.MAIN_IMAGE_KEY, web_image)
+
             vectors.append(vector)
 
         if len(vectors) == 0:
@@ -64,13 +75,13 @@ class ImageProcessor:
 
         self.vector_storage.persist(name, aggregated_vector)
 
-        logger.info(f"{aggregated_vector[:5]}")
-
 
 def main():
     processor = ImageProcessor(
         WikipediaImageRetriever(),
         FaceNetPyTorchImageVectoriser(),
+        ImageResizer(config.MAX_WEB_IMAGE_SIZE),
+        FsImageStorage(config.IMAGE_STORAGE_ROOT),
         MedianVectorAggregator(),
         FsVectorStorage(config.VECTOR_STORAGE_ROOT),
     )
@@ -78,9 +89,10 @@ def main():
     with open("/Users/hayden.jeune/Downloads/name.basics.tsv") as file:
         reader = csv.reader(file, delimiter="\t")
         for i, row in enumerate(reader):
-            if i > 100:
+            if i > 500:
                 break
-            elif i < 83:
+            elif i < 1:
+                # skip header
                 continue
 
             name = row[1]
