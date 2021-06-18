@@ -1,7 +1,7 @@
 import csv
-from PIL import Image
 from loguru import logger
 from lib.image.storage import FsImageStorage, ImageStorage
+from lib.storage.metadata import FsMetadataStorage, MetadataStorage
 
 from worker.configuration import get_config
 from lib.image.retrieve import (
@@ -33,6 +33,7 @@ class ImageProcessor:
         image_storage: ImageStorage,
         vector_aggregator: VectorAggregator,
         vector_storage: VectorStorage,
+        metadata_storage: MetadataStorage,
     ) -> None:
         self.image_retriever = image_retriever
         self.image_vectoriser = image_vectoriser
@@ -40,6 +41,7 @@ class ImageProcessor:
         self.image_storage = image_storage
         self.vector_aggregator = vector_aggregator
         self.vector_storage = vector_storage
+        self.metadata_storage = metadata_storage
 
     def process(self, name: str):
         """Stores a key image and a face vector given a celebrities name
@@ -47,10 +49,10 @@ class ImageProcessor:
         Throws:
             lib.image.retrieve.ImageRetrieverException
         """
-        images = self.image_retriever.retrieve(name)
+        metadata = {"name": name, "images": []}
 
         vectors = []
-        for image in images:
+        for image, location in self.image_retriever.retrieve(name):
             if len(vectors) >= config.MAX_VECTORS_PER_PERSON:
                 break
 
@@ -64,16 +66,18 @@ class ImageProcessor:
                 self.image_storage.persist(name, config.MAIN_IMAGE_KEY, web_image)
 
             vectors.append(vector)
+            metadata["images"].append(location)
 
         if len(vectors) == 0:
             logger.error(f"No face vectors found for {name}")
             # TODO: put to DLQ
             return
 
-        aggregated_vector = self.vector_aggregator.aggregate(vectors)
         # TODO: some quality checks?
-
+        aggregated_vector = self.vector_aggregator.aggregate(vectors)
         self.vector_storage.persist(name, aggregated_vector)
+
+        self.metadata_storage.persist(name, metadata)
 
 
 def main():
@@ -81,15 +85,16 @@ def main():
         WikipediaImageRetriever(),
         FaceNetPyTorchImageVectoriser(),
         ImageResizer(config.MAX_WEB_IMAGE_SIZE),
-        FsImageStorage(config.IMAGE_STORAGE_ROOT),
+        FsImageStorage(config.STORAGE_ROOT),
         MedianVectorAggregator(),
-        FsVectorStorage(config.VECTOR_STORAGE_ROOT),
+        FsVectorStorage(config.STORAGE_ROOT),
+        FsMetadataStorage(config.STORAGE_ROOT),
     )
 
     with open("/Users/hayden.jeune/Downloads/name.basics.tsv") as file:
         reader = csv.reader(file, delimiter="\t")
         for i, row in enumerate(reader):
-            if i > 500:
+            if i > 5000:
                 break
             elif i < 1:
                 # skip header

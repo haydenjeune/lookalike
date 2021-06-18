@@ -4,7 +4,7 @@ import io
 import logging
 from sys import exc_info
 from urllib.parse import quote
-from typing import Iterable, Optional
+from typing import Iterable, Optional, Tuple
 
 from bs4 import BeautifulSoup
 from PIL import Image, UnidentifiedImageError
@@ -21,7 +21,7 @@ class ImageRetrieverException(Exception):
 
 class ImageRetriever(ABC):
     @abstractmethod
-    def retrieve(self, name: str, max_images=None) -> Iterable[Image.Image]:
+    def retrieve(self, name: str, max_images=None) -> Iterable[Tuple[Image.Image, str]]:
         pass
 
 
@@ -36,7 +36,7 @@ class WikipediaImageRetriever(ImageRetriever):
     _url: str = "https://en.wikipedia.org"
     _page_stem: str = "/wiki/"
 
-    def retrieve(self, name: str, max_images=None) -> Iterable[Image.Image]:
+    def retrieve(self, name: str, max_images=None) -> Iterable[Tuple[Image.Image, str]]:
         resp = requests.get(self._url + self._page_stem + self._encode_name(name))
         if resp.status_code == 404:
             raise ImageRetrieverException(f"No main page found at {resp.url}")
@@ -61,7 +61,7 @@ class WikipediaImageRetriever(ImageRetriever):
                         continue
                     resp = requests.get(image_url, stream=True)
                     retrieved += 1
-                    yield Image.open(io.BytesIO(resp.content)).convert("RGB")
+                    yield Image.open(io.BytesIO(resp.content)).convert("RGB"), image_url
                 except UnidentifiedImageError as e:
                     logger.warning(f"Received bad image data for {url}", exc_info=e)
 

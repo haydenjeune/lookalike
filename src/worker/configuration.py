@@ -4,12 +4,8 @@ import os
 
 @environ.config()
 class Config:
-    VECTOR_STORAGE_ROOT = environ.var(
-        name="VECTOR_STORAGE_ROOT",
-        default="file:///Users/hayden.jeune/.celebstore/worker2",
-    )
-    IMAGE_STORAGE_ROOT = environ.var(
-        name="IMAGE_STORAGE_ROOT",
+    STORAGE_ROOT = environ.var(
+        name="STORAGE_ROOT",
         default="file:///Users/hayden.jeune/.celebstore/worker2",
     )
     MAX_VECTORS_PER_PERSON = environ.var(
