@@ -13,6 +13,26 @@ def test_retrieve_after_persist():
     assert data == read_data
 
 
+def test_retrieve_handles_unicode_data():
+    data = {"key": "úñíčödē"}
+    sut = FsMetadataStorage("memory://test")
+
+    sut.persist("Sally Britty 1.1", data)
+    read_data = sut.retrieve("Sally Britty 1.1")
+
+    assert data == read_data
+
+
+def test_retrieve_handles_unicode_name():
+    data = {"key": "value"}
+    sut = FsMetadataStorage("memory://test")
+
+    sut.persist("Sälly Britty", data)
+    read_data = sut.retrieve("Sälly Britty")
+
+    assert data == read_data
+
+
 def test_retrieve_without_persist():
     sut = FsMetadataStorage("memory://test")
 

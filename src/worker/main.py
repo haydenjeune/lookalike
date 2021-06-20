@@ -94,9 +94,10 @@ def main():
     with open("/Users/hayden.jeune/Downloads/name.basics.tsv") as file:
         reader = csv.reader(file, delimiter="\t")
         for i, row in enumerate(reader):
-            if i > 5000:
+            if i > 20000:
                 break
-            elif i < 1:
+            # why does Buzz Aldrin 4674 not work?
+            elif i < 10000:
                 # skip header
                 continue
 

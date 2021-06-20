@@ -70,6 +70,8 @@ environ-config==20.1.0
     # via -r requirements.in
 facenet-pytorch==2.5.2
     # via -r requirements.in
+faiss-cpu==1.7.1.post2
+    # via -r requirements.in
 flask-cors==3.0.10
     # via -r requirements.in
 flask==1.1.2
