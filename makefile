@@ -62,3 +62,6 @@ lint: setup infrastructure/aws/template.yaml
 deploy-cfn:
 # TODO: deploy cfn template 
 	stackit up --template infrastructure/aws/template.yaml --stack-name lookalike --region ap-southeast-2
+
+generate-grpc:
+	$(python) -m grpc_tools.protoc -I src/protos --python_out=src/lib/index --grpc_python_out=src/lib/index src/protos/index.proto

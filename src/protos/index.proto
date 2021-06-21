@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+package index;
+
+service Index {
+    // Search the index
+    rpc Search (IndexSearch) returns (IndexResults) {}
+}
+
+// The request message containing serialised numpy array bytes
+message IndexSearch {
+    bytes vector = 1;
+    uint32 num_results = 2;
+}
+
+// The response message containing a list of celebrities
+message IndexResults {
+    repeated Celebrity celebrities = 1;
+}
+
+message Celebrity {
+    string name = 1;
+    float similarity = 2;
+}
