@@ -39,22 +39,20 @@ setup: $(.venv) $(requirements.txt)
 test:
 	./pants test tests/unit::
 
-build-api: setup
+build-api: $(.venv)
 	./pants package src/api
 
-build-worker: setup
+build-worker: $(.venv)
 	./pants package src/worker
 
-start-api: build-api
+start-api: $(.venv)
 	./pants run src/api
 
-start-web:
+start-web: 
 	npm --prefix web/lookalike-web start
 
-start-worker: build-worker
+start-worker: $(.venv)
 	./pants run src/worker
-
-start: start-web start-api
 
 lint: setup infrastructure/aws/template.yaml
 	$(.venv)/bin/cfn-lint infrastructure/aws/template.yaml
@@ -64,4 +62,4 @@ deploy-cfn:
 	stackit up --template infrastructure/aws/template.yaml --stack-name lookalike --region ap-southeast-2
 
 generate-grpc:
-	$(python) -m grpc_tools.protoc -I src/protos --python_out=src/lib/index --grpc_python_out=src/lib/index src/protos/index.proto
+	$(python) -m grpc_tools.protoc -I src/protos --python_out=src/index/generated --grpc_python_out=src/index/generated src/protos/index.proto

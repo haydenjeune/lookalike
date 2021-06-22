@@ -6,8 +6,8 @@ from typing import List
 import grpc
 from numpy import ndarray, save
 
-from lib.index.index_pb2_grpc import IndexStub
-from lib.index.index_pb2 import IndexSearch
+from index.generated.index_pb2_grpc import IndexStub
+from index.generated.index_pb2 import IndexSearch
 
 
 @dataclass

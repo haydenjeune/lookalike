@@ -6,8 +6,8 @@ from loguru import logger
 from numpy import load
 
 from index.configuration import get_config
-from lib.index.index_pb2 import IndexResults, Celebrity
-from lib.index.index_pb2_grpc import IndexServicer, add_IndexServicer_to_server
+from index.generated.index_pb2 import IndexResults, Celebrity
+from index.generated.index_pb2_grpc import IndexServicer, add_IndexServicer_to_server
 from lib.index.index import Index
 
 config = get_config()
