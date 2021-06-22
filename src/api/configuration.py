@@ -2,19 +2,15 @@ import environ
 import os
 
 
-VECTOR_INDEX_FILEPATH = "VECTOR_INDEX_FILEPATH"
-MAXIMUM_IMAGE_PIXELS = "MAXIMUM_IMAGE_PIXELS"
-
-
 @environ.config()
 class Config:
-    vector_index_filepath = environ.var(
-        name=VECTOR_INDEX_FILEPATH, default="/Users/hayden.jeune/.celebstore/vec"
+    MAXIMUM_IMAGE_PIXELS = environ.var(
+        name="MAXIMUM_IMAGE_PIXELS", default="5000000", converter=int
     )
-    max_image_pixels = environ.var(
-        name=MAXIMUM_IMAGE_PIXELS, default="5000000", converter=int
+    INDEX_SERVICE_ADDR = environ.var(
+        name="INDEX_SERVICE_ADDR", default="localhost:50051"
     )
 
 
-def get() -> Config:
+def get_config() -> Config:
     return environ.to_config(Config, os.environ)

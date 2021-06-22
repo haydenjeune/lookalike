@@ -6,13 +6,17 @@ from pathlib import Path
 from connexion import FlaskApp, ProblemException
 from flask_cors import CORS
 from PIL import Image, UnidentifiedImageError
+from numpy import save as save_numpy
 
-from api import configuration
-from lib.index.predictor import FaceNetDotProductPredictor
-from lib.index.storage import VectorIndex
+from api.configuration import get_config
+from index.client import IndexClient
+from lib.index.builder import FaceNetPyTorchImageVectoriser
 
-config = configuration.get()
-predictor = FaceNetDotProductPredictor(index=VectorIndex(config.vector_index_filepath))
+config = get_config()
+
+# TODO: sort out pants dependencies on this package
+index_service = IndexClient(config.INDEX_SERVICE_ADDR)
+vectoriser = FaceNetPyTorchImageVectoriser()
 
 
 def ping():
@@ -23,13 +27,17 @@ def find_lookalike(body: bytes):
     im = _deserialise_image(body)
 
     # check for decompression bombs
-    if im.size[0] * im.size[1] > config.max_image_pixels:
+    if im.size[0] * im.size[1] > config.MAXIMUM_IMAGE_PIXELS:
         _raise_unprocessable_entity("Image exceeds allowed number of pixels")
 
     # remove any alpha layer
     im = im.convert("RGB")
 
-    celebs = predictor.predict(im)
+    vec = vectoriser.vectorise(im)
+    if vec is None:
+        return [], 200
+
+    celebs = index_service.search(vec)
 
     return celebs, 200
 
