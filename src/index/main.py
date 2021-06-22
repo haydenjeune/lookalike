@@ -1,26 +1,45 @@
 from concurrent import futures
+from io import BytesIO
 
 import grpc
 from loguru import logger
+from numpy import load
 
-from lib.index.index_pb2 import IndexSearch, IndexResults, Celebrity
+from index.configuration import get_config
+from lib.index.index_pb2 import IndexResults, Celebrity
 from lib.index.index_pb2_grpc import IndexServicer, add_IndexServicer_to_server
+from lib.index.index import Index
+
+config = get_config()
 
 
 class IndexService(IndexServicer):
+    """IndexService is the Server for the vector similarity search over gRPC"""
+
+    def __init__(self):
+        super().__init__()
+        self.faiss_index = Index(
+            config.INDEX_VECTOR_DIMENSIONS, from_dir=config.INDEX_ROOT
+        )
+
     def Search(self, request, context):
+        vec = load(BytesIO(request.vector), allow_pickle=False)
+
         return IndexResults(
             celebrities=[
-                Celebrity(name="Test Celeb", similarity=1.0)
-                for _ in range(request.num_results)
+                Celebrity(name=name, similarity=similarity)
+                for name, similarity in self.faiss_index.search(
+                    vec, request.num_results
+                )
             ]
         )
 
 
 def serve():
-    server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
+    # Faiss search releases GIL so threadpool allows use of multi cores
+    server = grpc.server(futures.ThreadPoolExecutor(max_workers=config.MAX_WORKERS))
     add_IndexServicer_to_server(IndexService(), server)
-    server.add_insecure_port("[::]:50051")
+    server.add_insecure_port(config.ADDRESS)
     server.start()
     server.wait_for_termination()
 
