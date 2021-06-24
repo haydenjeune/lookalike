@@ -6,11 +6,10 @@ from pathlib import Path
 from connexion import FlaskApp, ProblemException
 from flask_cors import CORS
 from PIL import Image, UnidentifiedImageError
-from numpy import save as save_numpy
 
 from api.configuration import get_config
 from index.client import IndexClient
-from lib.index.builder import FaceNetPyTorchImageVectoriser
+from lib.model.facenet import FaceNetPyTorchImageVectoriser
 
 config = get_config()
 
@@ -61,7 +60,7 @@ def _raise_unprocessable_entity(msg: str):
     raise ProblemException(422, "Unprocessable Entity", msg)
 
 
-connexion_app = FlaskApp(__name__, specification_dir=Path(__file__).parent.resolve())
+connexion_app = FlaskApp(__name__, specification_dir=Path(__file__).parent.resolve()) 
 connexion_app.add_api("spec.yaml", strict_validation=True)
 connexion_app.add_error_handler(Exception, FlaskApp.common_error_handler)
 CORS(connexion_app.app)  # TODO: only do this in dev for all origins

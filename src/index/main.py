@@ -8,7 +8,7 @@ from numpy import load
 from index.configuration import get_config
 from index.generated.index_pb2 import IndexResults, Celebrity
 from index.generated.index_pb2_grpc import IndexServicer, add_IndexServicer_to_server
-from lib.index.index import Index
+from lib.index.faiss import FaissIndex
 
 config = get_config()
 
@@ -18,7 +18,7 @@ class IndexService(IndexServicer):
 
     def __init__(self):
         super().__init__()
-        self.faiss_index = Index(
+        self.faiss_index = FaissIndex(
             config.INDEX_VECTOR_DIMENSIONS, from_dir=config.INDEX_ROOT
         )
 

@@ -1,11 +1,13 @@
 python_library(
   dependencies=[
     '3rdparty/python:environ-config',
-    'src/lib/index',
+    'src/lib/common',
+    'src/lib/image',
+    'src/lib/model',
+    'src/lib/vector',
   ],
   name='worker-lib',
-)   
-
+)
 
 pex_binary(
   name='worker',

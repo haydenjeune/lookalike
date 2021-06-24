@@ -39,11 +39,16 @@ setup: $(.venv) $(requirements.txt)
 test:
 	./pants test tests/unit::
 
+build: build-api build-index build-worker
+
 build-api: $(.venv)
 	./pants package src/api
 
 build-worker: $(.venv)
 	./pants package src/worker
+
+build-index: $(.venv)
+	./pants package src/index
 
 start-api: $(.venv)
 	./pants run src/api
@@ -53,6 +58,10 @@ start-web:
 
 start-worker: $(.venv)
 	./pants run src/worker
+
+start-index: $(.venv)
+	./pants run src/index
+
 
 lint: setup infrastructure/aws/template.yaml
 	$(.venv)/bin/cfn-lint infrastructure/aws/template.yaml

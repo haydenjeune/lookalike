@@ -1,15 +1,10 @@
 from abc import ABC, abstractmethod
-from typing import List, Optional
+from typing import Optional
 
 from PIL import Image
 from facenet_pytorch import MTCNN, InceptionResnetV1
 from torch import no_grad
-from numpy import ndarray, array, median
-from numpy.linalg import norm
-
-
-class FaceNotFound(Exception):
-    pass
+from numpy import ndarray
 
 
 class ImageVectoriser(ABC):
@@ -34,15 +29,3 @@ class FaceNetPyTorchImageVectoriser(ImageVectoriser):
         vec = self.face_vectoriser(cropped.unsqueeze(0)).squeeze()
 
         return vec.numpy()
-
-
-class VectorAggregator(ABC):
-    @abstractmethod
-    def aggregate(self, vectors: List[ndarray]) -> ndarray:
-        pass
-
-
-class MedianVectorAggregator(VectorAggregator):
-    def aggregate(self, vectors: List[ndarray]) -> ndarray:
-        combined = median(array(vectors), axis=0)
-        return combined / norm(combined)

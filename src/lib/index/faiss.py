@@ -1,13 +1,11 @@
-from __future__ import annotations
-from typing import List, Dict, Optional, Tuple
+from typing import List, Optional, Tuple
 from pathlib import Path
 
-from loguru import logger
 import faiss
 import numpy as np
 
 
-class Index:
+class FaissIndex:
     """An index for efficiently searching dense vectors
 
     Thread safe if add is not called concurrently. faiss will release the GIL
@@ -35,7 +33,8 @@ class Index:
 
         next_id = len(self.name_lookup)
         ids = np.arange(next_id, next_id + n_vecs)
-        self.index.add_with_ids(vector, ids)
+        # for some reason PyRight gets the function signature wrong
+        self.index.add_with_ids(vector, ids)  # type: ignore
         self.name_lookup.extend(names)
 
     def search(self, vector: np.ndarray, k: int = 5) -> List[Tuple[str, float]]:
@@ -44,7 +43,8 @@ class Index:
             raise ValueError("Given vector has incorrect dimensionality")
 
         vector = np.expand_dims(vector, axis=0)
-        D, I = self.index.search(vector, k)
+        # for some reason PyRight gets the function signature wrong
+        D, I = self.index.search(vector, k)  # type: ignore
 
         names = [self.name_lookup[i] for i in I.squeeze(axis=0)]
         similarity = [-(dist / 2) + 1 for dist in D.squeeze(axis=0)]

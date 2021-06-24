@@ -8,7 +8,8 @@ python_library(
     '3rdparty/python:connexion',
     '3rdparty/python:pillow',
     '3rdparty/python:environ-config',
-    'src/lib/index',
+    'src/index:index-client',
+    'src/lib/model',
   ],
   name='api-lib',
 )   

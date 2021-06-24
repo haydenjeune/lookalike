@@ -1,9 +1,10 @@
 from abc import ABC, abstractmethod
 from typing import Optional
-from string import punctuation, whitespace
 
 from fsspec import open as fsspec_open
 from PIL import Image, UnidentifiedImageError
+
+from lib.common.fs import _map_name_to_path, _validate_root
 
 
 class LocalImageStorageException(Exception):
@@ -24,26 +25,17 @@ class ImageStorage(ABC):
         pass
 
 
-name_to_path_translation = str.maketrans("", "", punctuation + whitespace)
-
-
 class FsImageStorage(ImageStorage):
     STORAGE_FORMAT = "jpeg"
 
     def __init__(self, root: str):
-        self._validate_root(root)
+        _validate_root(root)
         self.root = root
-
-    @staticmethod
-    def _validate_root(root: str):
-        scheme = root.split("://")[0]
-        if "://" not in root or scheme not in {"s3", "memory", "file"}:
-            raise ValueError(f"Invalid file system scheme {scheme}")
 
     def _build_path(
         self, celebrity_name: str, key: str, extension: Optional[str]
     ) -> str:
-        path = f"{self.root}/{celebrity_name.translate(name_to_path_translation)}/{key}"
+        path = f"{self.root}/{_map_name_to_path(celebrity_name)}/{key}"
         if extension:
             path += f".{extension}"
         return path

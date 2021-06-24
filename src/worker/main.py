@@ -1,21 +1,24 @@
 import csv
-from loguru import logger
-from lib.image.storage import FsImageStorage, ImageStorage
-from lib.storage.metadata import FsMetadataStorage, MetadataStorage
 
+from loguru import logger
+
+from lib.common.metadata import FsMetadataStorage, MetadataStorage
 from worker.configuration import get_config
 from lib.image.retrieve import (
     ImageRetriever,
     WikipediaImageRetriever,
 )
+from lib.image.storage import FsImageStorage, ImageStorage
 from lib.image.convert import ImageResizer
-from lib.index.builder import (
+from lib.model.facenet import (
     ImageVectoriser,
     FaceNetPyTorchImageVectoriser,
+)
+from lib.vector.aggregator import (
     VectorAggregator,
     MedianVectorAggregator,
 )
-from lib.index.storage import (
+from lib.vector.storage import (
     VectorStorage,
     FsVectorStorage,
 )

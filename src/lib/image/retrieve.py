@@ -1,8 +1,6 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-import io
-import logging
-from sys import exc_info
+from io import BytesIO
 from urllib.parse import quote
 from typing import Iterable, Optional, Tuple
 
@@ -61,7 +59,7 @@ class WikipediaImageRetriever(ImageRetriever):
                         continue
                     resp = requests.get(image_url, stream=True)
                     retrieved += 1
-                    yield Image.open(io.BytesIO(resp.content)).convert("RGB"), image_url
+                    yield Image.open(BytesIO(resp.content)).convert("RGB"), image_url
                 except UnidentifiedImageError as e:
                     logger.warning(f"Received bad image data for {url}", exc_info=e)
 
