@@ -62,7 +62,6 @@ start-worker: $(.venv)
 start-index: $(.venv)
 	./pants run src/index
 
-
 lint: setup infrastructure/aws/template.yaml
 	$(.venv)/bin/cfn-lint infrastructure/aws/template.yaml
 
@@ -71,4 +70,4 @@ deploy-cfn:
 	stackit up --template infrastructure/aws/template.yaml --stack-name lookalike --region ap-southeast-2
 
 generate-grpc:
-	$(python) -m grpc_tools.protoc -I src/protos --python_out=src/index/generated --grpc_python_out=src/index/generated src/protos/index.proto
+	$(python) -m grpc_tools.protoc -I src/protos --python_out=src/index/generated --grpc_python_out=src/index/generated src/index/index.proto
