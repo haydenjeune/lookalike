@@ -16,3 +16,10 @@ Resources:
             Resource:
             - !Sub arn:aws:s3:::${ImageBucket}/*/0.jpg
             Principal: "*"
+  ScrapeQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: lookalike-extraction-queue
+      MaximumMessageSize: 1024
+      MessageRetentionPeriod: 1058400 # 7 days
+      ReceiveMessageWaitTimeSeconds: 20 # enable long polling

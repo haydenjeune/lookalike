@@ -1,5 +1,6 @@
 import csv
 
+import boto3
 from loguru import logger
 
 from lib.common.metadata import FsMetadataStorage, MetadataStorage
@@ -94,23 +95,36 @@ def main():
         FsMetadataStorage(config.STORAGE_ROOT),
     )
 
-    with open("/Users/hayden.jeune/Downloads/name.basics.tsv") as file:
-        reader = csv.reader(file, delimiter="\t")
-        for i, row in enumerate(reader):
-            if i > 20000:
-                break
-            # why does Buzz Aldrin 4674 not work?
-            elif i < 10000:
-                # skip header
-                continue
+    sqs = boto3.resource("sqs")
+    queue = sqs.Queue(config.EXTRACTION_QUEUE_URL)
 
-            name = row[1]
-
-            logger.info(f"[{i}] {name}")
+    while True:
+        for message in queue.receive_messages(MaxNumberOfMessages=3, WaitTimeSeconds=20):
+            name = message.body
             try:
                 processor.process(name)
             except Exception as e:
                 logger.error(f"Failed to process {name}: {e}")
+            finally:
+                message.delete()
+
+    # with open("/Users/hayden.jeune/Downloads/name.basics.tsv") as file:
+    #     reader = csv.reader(file, delimiter="\t")
+    #     for i, row in enumerate(reader):
+    #         if i > 20000:
+    #             break
+    #         # why does Buzz Aldrin 4674 not work?
+    #         elif i < 10000:
+    #             # skip header
+    #             continue
+
+    #         name = row[1]
+
+    #         logger.info(f"[{i}] {name}")
+    #         try:
+    #             processor.process(name)
+    #         except Exception as e:
+    #             logger.error(f"Failed to process {name}: {e}")
 
 
 if __name__ == "__main__":
