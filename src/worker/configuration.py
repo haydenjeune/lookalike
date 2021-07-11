@@ -6,7 +6,7 @@ import os
 class Config:
     STORAGE_ROOT = environ.var(
         name="STORAGE_ROOT",
-        default="file:///Users/hayden.jeune/.celebstore/worker2",
+        default="file:///Users/hayden.jeune/.celebstore/worker3",
     )
     MAX_VECTORS_PER_PERSON = environ.var(
         name="MAX_VECTORS_PER_PERSON", default="3", converter=int

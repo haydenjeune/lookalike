@@ -1,5 +1,3 @@
-import csv
-
 import boto3
 from loguru import logger
 
@@ -53,6 +51,11 @@ class ImageProcessor:
         Throws:
             lib.image.retrieve.ImageRetrieverException
         """
+        # do not proceed if we've already done this celeb
+        if self.metadata_storage.exists(name):
+            logger.info(f"Skipping {name}: Already done")
+            return
+
         metadata = {"name": name, "images": []}
 
         vectors = []
@@ -74,12 +77,10 @@ class ImageProcessor:
 
         if len(vectors) == 0:
             logger.error(f"No face vectors found for {name}")
-            # TODO: put to DLQ
-            return
-
-        # TODO: some quality checks?
-        aggregated_vector = self.vector_aggregator.aggregate(vectors)
-        self.vector_storage.persist(name, aggregated_vector)
+        else:
+            # TODO: some quality checks?
+            aggregated_vector = self.vector_aggregator.aggregate(vectors)
+            self.vector_storage.persist(name, aggregated_vector)
 
         self.metadata_storage.persist(name, metadata)
 
@@ -99,7 +100,11 @@ def main():
     queue = sqs.Queue(config.EXTRACTION_QUEUE_URL)
 
     while True:
-        for message in queue.receive_messages(MaxNumberOfMessages=3, WaitTimeSeconds=20):
+        messages = queue.receive_messages(MaxNumberOfMessages=3, WaitTimeSeconds=20)
+        logger.info(f"Received {len(messages)} messages from queue")
+
+        for message in messages:
+            logger.info(f"Received message: {message.body}")
             name = message.body
             try:
                 processor.process(name)
@@ -107,24 +112,6 @@ def main():
                 logger.error(f"Failed to process {name}: {e}")
             finally:
                 message.delete()
-
-    # with open("/Users/hayden.jeune/Downloads/name.basics.tsv") as file:
-    #     reader = csv.reader(file, delimiter="\t")
-    #     for i, row in enumerate(reader):
-    #         if i > 20000:
-    #             break
-    #         # why does Buzz Aldrin 4674 not work?
-    #         elif i < 10000:
-    #             # skip header
-    #             continue
-
-    #         name = row[1]
-
-    #         logger.info(f"[{i}] {name}")
-    #         try:
-    #             processor.process(name)
-    #         except Exception as e:
-    #             logger.error(f"Failed to process {name}: {e}")
 
 
 if __name__ == "__main__":

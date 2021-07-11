@@ -57,7 +57,12 @@ class WikipediaImageRetriever(ImageRetriever):
                         or image_url.split(".")[-1].lower() not in VALID_EXTENSIONS
                     ):
                         continue
-                    resp = requests.get(image_url, stream=True)
+                    resp = requests.get(
+                        image_url,
+                        stream=True,
+                        headers={"user-agent": "Lookalike/0.1 (hejeune@gmail.com)"},
+                    )
+                    # TODO: Handle 429 and split out a singleton wikipedia client to rate limit
                     retrieved += 1
                     yield Image.open(BytesIO(resp.content)).convert("RGB"), image_url
                 except UnidentifiedImageError as e:

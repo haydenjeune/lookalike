@@ -18,6 +18,10 @@ class MetadataStorage(ABC):
     def retrieve(self, celebrity_name: str) -> Optional[Dict[str, str]]:
         pass
 
+    @abstractmethod
+    def exists(self, celebrity_name: str) -> bool:
+        pass
+
 
 class FsMetadataStorage(MetadataStorage):
     def __init__(self, root: str):
@@ -39,3 +43,12 @@ class FsMetadataStorage(MetadataStorage):
                 return load(f)
         except FileNotFoundError:
             return None
+
+    def exists(self, celebrity_name: str) -> bool:
+        path = self._build_path(celebrity_name)
+        try:
+            with fsspec_open(path, "r") as f:
+                # just enter the context and check for the exception
+                return True
+        except FileNotFoundError:
+            return False
