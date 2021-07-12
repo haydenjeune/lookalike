@@ -6,11 +6,11 @@ import os
 class Config:
     STORAGE_ROOT = environ.var(
         name="STORAGE_ROOT",
-        default="/Users/hayden.jeune/.celebstore/worker2",
+        default="/Users/hayden.jeune/.celebstore/worker3",
     )
     INDEX_ROOT = environ.var(
         name="STORAGE_ROOT",
-        default="/Users/hayden.jeune/.celebstore/index",
+        default="/Users/hayden.jeune/.celebstore/index3",
     )
 
 

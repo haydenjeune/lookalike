@@ -6,7 +6,7 @@ import os
 class Config:
     INDEX_ROOT = environ.var(
         name="INDEX_ROOT",
-        default="/Users/hayden.jeune/.celebstore/index",
+        default="/Users/hayden.jeune/.celebstore/index3",
     )
     INDEX_VECTOR_DIMENSIONS = environ.var(
         name="INDEX_VECTOR_DIMENSIONS",

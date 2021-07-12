@@ -1,15 +1,14 @@
-from typing import List, Dict
+from typing import Tuple, Optional
 from pathlib import Path
 from json import load as load_json
 
 from loguru import logger
-import faiss
 from numpy import ndarray, arange
 import numpy as np
 from numpy import load as load_numpy
 
 
-from lib.index.index import Index
+from lib.index.faiss import FaissIndex
 from indexer.configuration import get_config
 
 config = get_config()
@@ -31,27 +30,34 @@ def get_vector(path: Path):
         return load_numpy(f, allow_pickle=False)
 
 
+def get_data(path: Path) -> Optional[Tuple[str, ndarray]]:
+    if (path / "vec.npy").exists() and (path / "meta.json").exists:
+        return get_name(path), get_vector(path)
+
+    return None
+
+
 def main():
     root = Path(config.STORAGE_ROOT)
 
-    index = Index(vec_dimensions=512)
+    index = FaissIndex(vec_dimensions=512)
     records = list(root.glob("*/"))
 
-    names = [get_name(record) for record in records]
-    vectors = np.array([get_vector(record) for record in records])
+    data = [get_data(record) for record in records]
+    names, vectors = zip(*[val for val in data if val is not None])
+    vectors = np.array(vectors)
 
     index.add(names, vectors)
-
-
     index.save(config.INDEX_ROOT)
 
-    new_index = Index(from_dir=config.INDEX_ROOT)
-
+    # verify saved index
+    new_index = FaissIndex(from_dir=config.INDEX_ROOT)
     search_name = names[5]
     search_vec = vectors[5]
     print(f"Looking for {search_name}")
     print("Found:")
     print(new_index.search(search_vec))
+
 
 if __name__ == "__main__":
     logger.info("Starting indexer...")
