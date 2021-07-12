@@ -1,7 +1,7 @@
 import numpy as np
 from math import sqrt
 
-from lib.index.builder import MedianVectorAggregator
+from lib.vector.aggregator import MedianVectorAggregator
 
 
 def test_median_vector_aggregator():

@@ -2,24 +2,40 @@ from base64 import b64encode
 
 from connexion import ProblemException
 import pytest
+import numpy as np
 
-import api.app as app
-from lib.index.predictor import Result
-
-
-@pytest.fixture()
-def prediction():
-    return [Result("Justin Bieber", 0.5)]
+from api import app
+from index.client import SearchResult
 
 
 @pytest.fixture()
-def predictor(mocker, prediction):
-    mocker.patch("api.app.FaceNetDotProductPredictor.predict", return_value=prediction)
+def vector():
+    return np.random.rand(512)
 
 
 @pytest.fixture()
-def empty_predictor(mocker):
-    mocker.patch("api.app.FaceNetDotProductPredictor.predict", return_value=[])
+def search_results():
+    return [SearchResult("test one", 0.5)]
+
+
+@pytest.fixture()
+def vectoriser(mocker, vector):
+    mocker.patch("api.app.FaceNetPyTorchImageVectoriser.vectorise", return_value=vector)
+
+
+@pytest.fixture()
+def empty_vectoriser(mocker):
+    mocker.patch("api.app.FaceNetPyTorchImageVectoriser.vectorise", return_value=None)
+
+
+@pytest.fixture()
+def index_service(mocker, search_results):
+    mocker.patch("api.app.IndexClient.search", return_value=search_results)
+
+
+@pytest.fixture()
+def empty_index_service(mocker):
+    mocker.patch("api.app.IndexClient.search", return_value=[])
 
 
 @pytest.fixture()
@@ -63,11 +79,11 @@ def test_post_throws_exception_with_decompression_bomb(decompression_bomb_data):
     assert e.value.status == 422
 
 
-def test_post_jpeg(predictor, prediction, b64_jpg_data):
+def test_post_jpeg(vectoriser, index_service, search_results, b64_jpg_data):
     response = app.find_lookalike(b64_jpg_data)
-    assert response == (prediction, 200)
+    assert response == (search_results, 200)
 
 
-def test_post_no_prediction(empty_predictor, b64_jpg_data):
+def test_post_no_prediction(empty_vectoriser, index_service, b64_jpg_data):
     response = app.find_lookalike(b64_jpg_data)
     assert response == ([], 200)

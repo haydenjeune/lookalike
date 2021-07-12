@@ -10,7 +10,6 @@ def test_convert_resizes_image():
     sut = ImageResizer(max_size=512)
 
     new_img = sut.convert(img)
-    new_img.show()
 
     assert max(new_img.size) == 512
 

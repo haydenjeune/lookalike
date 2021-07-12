@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 
-from lib.index.storage import FsVectorStorage
+from lib.vector.storage import FsVectorStorage
 
 
 def test_retrieve_after_persist():
