@@ -61,7 +61,7 @@ if __name__ == "__main__":
     sqs = boto3.resource("sqs")
     queue = sqs.Queue(config.EXTRACTION_QUEUE_URL)
 
-    for names in ImdbNameScraper("male, female", 3, 19):
+    for names in ImdbNameScraper("female", 0, 99):
         for batch in batcher(names, n=10):
             logger.info(f"Sending batch {batch}")
             queue.send_messages(

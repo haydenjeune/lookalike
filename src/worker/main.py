@@ -99,9 +99,23 @@ def main():
     sqs = boto3.resource("sqs")
     queue = sqs.Queue(config.EXTRACTION_QUEUE_URL)
 
+    counter = 0
+
     while True:
         messages = queue.receive_messages(MaxNumberOfMessages=3, WaitTimeSeconds=20)
         logger.info(f"Received {len(messages)} messages from queue")
+
+        # handle empty message limit
+        if len(messages) == 0:
+            counter += 1
+        else:
+            counter = 0
+        if (
+            config.CONSECUTIVE_EMPTY_MESSAGE_LIMIT != -1
+            and counter > config.CONSECUTIVE_EMPTY_MESSAGE_LIMIT
+        ):
+            logger.info("Reached consecutive empty message limit. Exiting.")
+            return
 
         for message in messages:
             logger.info(f"Received message: {message.body}")
