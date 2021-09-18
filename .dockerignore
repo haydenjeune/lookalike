@@ -4,4 +4,4 @@
 .pytest_cache
 .venv
 .vscode
-**/node_modules
+node_modules

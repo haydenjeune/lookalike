@@ -4,14 +4,8 @@
 #
 #    pip-compile --output-file=3rdparty/python/requirements.txt requirements.in
 #
---index-url https://pypi.python.org/simple
-
 anyio==2.2.0
     # via jupyter-server
-appnope==0.1.2
-    # via
-    #   ipykernel
-    #   ipython
 argon2-cffi==20.1.0
     # via
     #   jupyter-server

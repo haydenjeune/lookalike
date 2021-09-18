@@ -17,6 +17,8 @@ config = get_config()
 index_service = IndexClient(config.INDEX_SERVICE_ADDR)
 vectoriser = FaceNetPyTorchImageVectoriser()
 
+app = None
+
 
 def ping():
     return "pong"
@@ -60,7 +62,7 @@ def _raise_unprocessable_entity(msg: str):
     raise ProblemException(422, "Unprocessable Entity", msg)
 
 
-connexion_app = FlaskApp(__name__, specification_dir=Path(__file__).parent.resolve()) 
+connexion_app = FlaskApp(__name__, specification_dir=Path(__file__).parent.resolve())
 connexion_app.add_api("spec.yaml", strict_validation=True)
 connexion_app.add_error_handler(Exception, FlaskApp.common_error_handler)
 CORS(connexion_app.app)  # TODO: only do this in dev for all origins
@@ -69,4 +71,5 @@ CORS(connexion_app.app)  # TODO: only do this in dev for all origins
 if __name__ == "__main__":
     connexion_app.run(port=5000)
 else:
+    # hook for gunicorn
     app = connexion_app.app
