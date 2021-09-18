@@ -22,6 +22,9 @@ class Config:
         name="EXTRACTION_QUEUE_URL",
         default="https://sqs.ap-southeast-2.amazonaws.com/311908471898/lookalike-extraction-queue",
     )
+    CONSECUTIVE_EMPTY_MESSAGE_LIMIT = environ.var(
+        name="CONSECUTIVE_EMPTY_MESSAGE_LIMIT", default="10", converter=int
+    )
 
 
 def get_config() -> Config:
