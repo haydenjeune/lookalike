@@ -1,4 +1,31 @@
+project_name: lookalike
+
 containers:
+  aws-cli-env:
+    image: "amazon/aws-cli:2.2.27"
+    volumes:
+      - local: .
+        container: /code
+        options: cached
+      - local: ~/.aws
+        container: /root/.aws
+        options: cached
+    environment:
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID:-}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY:-}
+      AWS_DEFAULT_REGION: ${AWS_DEFAULT_REGION:-ap-southeast-2}
+    working_directory: /code
+
+  docker-env:
+    image: "docker:20"
+    volumes:
+      - local: .
+        container: /code
+        options: cached
+      - local: /var/run/docker.sock
+        container: /var/run/docker.sock
+    working_directory: /code
+
   build-env:
     build_directory: .
     dockerfile: infrastructure/docker/build-env.Dockerfile
@@ -11,21 +38,70 @@ containers:
         options: cached
     working_directory: /code
 
+  index-service:
+    build_directory: .
+    dockerfile: infrastructure/docker/api.Dockerfile
+
+  api-service:
+    build_directory: .
+    dockerfile: infrastructure/docker/api.Dockerfile
+    dependencies:
+      - index-service
+
 tasks:
   shell:
     description: Open a shell in the dev environment
     run:
       container: build-env
       command: bash
+
   compile-python-deps:
     description: Compiles the requirements.in to a requirements.txt file
     run:
       container: build-env
       command: pip-compile requirements.in -q -o 3rdparty/python/requirements.txt --cache-dir /root/.cache/pip-compile
-  build-api:
+
+  fetch-index:
+    description: Fetches the saved faiss index from s3
+    run:
+      container: aws-cli-env
+      command: s3 sync s3://lookalike-artefacts/index ./dist/index_files
+
+  build-api-service:
     description: Builds the api with Pants
     prerequisites:
       - compile-python-deps
     run:
       container: build-env
       command: ./pants package src/api
+
+  build-index-service:
+    description: Builds the index service with Pants
+    prerequisites:
+      - compile-python-deps
+    run:
+      container: build-env
+      command: ./pants package src/index
+
+  package-api-service:
+    description: Builds the api docker image
+    prerequisites:
+      - build-api-service
+    run:
+      container: docker-env
+      command: docker build -f infrastructure/docker/api.Dockerfile -t lookalike-api:latest .
+
+  package-index-service:
+    description: Builds the api docker image
+    prerequisites:
+      - build-index-service
+      - fetch-index
+    run:
+      container: docker-env
+      command: docker build -f infrastructure/docker/index.Dockerfile -t lookalike-index:latest .
+
+  package:
+    description: Packages all appplications into their respective containers
+    prerequisites:
+      - package-api-service
+      - package-index-service

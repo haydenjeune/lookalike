@@ -1,4 +1,4 @@
-FROM python:3.8 AS build-env
+FROM python:3.8
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     python3-dev \
@@ -11,3 +11,5 @@ RUN pip install --upgrade pip && \
 COPY requirements.in requirements.in
 RUN pip-compile requirements.in -o requirements.txt &&  \
     pip install -r requirements.txt
+
+WORKDIR /workdir
