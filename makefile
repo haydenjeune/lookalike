@@ -71,3 +71,6 @@ deploy-cfn:
 
 generate-grpc:
 	$(python) -m grpc_tools.protoc -I src/protos --python_out=src/index/generated --grpc_python_out=src/index/generated src/index/index.proto
+
+publish-demo: build-api build-index
+	./scripts/publish-demo-image.sh

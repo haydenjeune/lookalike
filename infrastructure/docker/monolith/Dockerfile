@@ -5,11 +5,20 @@ WORKDIR /workdir
 RUN npm run build
 
 
+FROM curlimages/curl:7.79.1 as model_artifact
+WORKDIR /data
+RUN curl https://github.com/timesler/facenet-pytorch/releases/download/v2.2.9/20180402-114759-vggface2.pt -LO --output-dir /data
+
+
 FROM python:3.8-slim
 LABEL org.opencontainers.image.source https://github.com/haydenjeune/lookalike
 
 # Install API
 COPY ./dist/src.api /api
+
+# Copy downloaded model artifact into the image
+COPY --from=model_artifact /data /api/.model/checkpoints
+ENV TORCH_HOME="/api/.model"
 
 # Install Index
 COPY ./dist/src.index /index

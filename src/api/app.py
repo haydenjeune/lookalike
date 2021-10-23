@@ -5,6 +5,7 @@ from pathlib import Path
 
 from connexion import FlaskApp, ProblemException
 from flask_cors import CORS
+from loguru import logger
 from PIL import Image, UnidentifiedImageError
 
 from api.configuration import get_config
@@ -69,6 +70,7 @@ CORS(connexion_app.app)  # TODO: only do this in dev for all origins
 
 
 if __name__ == "__main__":
+    logger.info("Starting API")
     connexion_app.run(port=5000)
 else:
     # hook for gunicorn
