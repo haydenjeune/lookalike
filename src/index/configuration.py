@@ -20,7 +20,7 @@ class Config:
     )
     ADDRESS = environ.var(
         name="ADDRESS",
-        default="[::]:50051",
+        default="[::]:5051",
     )
 
 

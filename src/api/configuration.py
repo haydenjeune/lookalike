@@ -8,7 +8,7 @@ class Config:
         name="MAXIMUM_IMAGE_PIXELS", default="5000000", converter=int
     )
     INDEX_SERVICE_ADDR = environ.var(
-        name="INDEX_SERVICE_ADDR", default="localhost:50051"
+        name="INDEX_SERVICE_ADDR", default="localhost:5051"
     )
 
 

@@ -4,7 +4,7 @@
 #		pyenv
 #
 
-PYTHON_VERSION = 3.8.8
+PYTHON_VERSION = 3.8.12
 
 .venv = .venv
 .python-version = .python-version
@@ -20,6 +20,7 @@ $(.python-version):
 $(.venv): $(.python-version)
 	echo Setting up virtualenv with python $(PYTHON_VERSION)
 	python -m venv $(.venv)
+	touch $(.venv)
 
 clean:
 	rm $(.python-version)
@@ -72,5 +73,14 @@ deploy-cfn:
 generate-grpc:
 	$(python) -m grpc_tools.protoc -I src/protos --python_out=src/index/generated --grpc_python_out=src/index/generated src/index/index.proto
 
-publish-demo: build-api build-index
+build-env:
+	docker build -f  infrastructure/docker/build-env.Dockerfile -t build-env .
+
+build-api-linux: build-env
+	docker run --rm -v $(shell pwd):/code --workdir /code build-env:latest "./pants package src/api"
+
+build-index-linux: build-env
+	docker run --rm -v $(shell pwd):/code --workdir /code build-env:latest "./pants package src/index"
+
+publish-demo: build-api-linux build-index-linux
 	./scripts/publish-demo-image.sh

@@ -10,7 +10,7 @@ WORKDIR /data
 RUN curl https://github.com/timesler/facenet-pytorch/releases/download/v2.2.9/20180402-114759-vggface2.pt -LO --output-dir /data
 
 
-FROM python:3.8-slim
+FROM python:3.8.12-slim
 LABEL org.opencontainers.image.source https://github.com/haydenjeune/lookalike
 
 # Install API

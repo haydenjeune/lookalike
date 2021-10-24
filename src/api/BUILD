@@ -22,5 +22,6 @@ pex_binary(
     ':api-config',
   ],
   entry_point='app.py',
+  inherit_path='fallback', # needed for connexion to be able to import pkg_resources
   zip_safe=False,
 )
