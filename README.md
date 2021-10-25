@@ -4,9 +4,7 @@ Lookalike combines machine learning and an efficient vector similarity search to
 
 ## Examples
 
-### The UI Flow
-
-Below is the lookalike UI, showcasing the webcam capture and viewing of the results. The results I get a somewhat unflattering, so below is the closest printed face I could find.
+Below is the lookalike UI, showcasing the webcam capture and viewing of the results. The results I get a somewhat unflattering, so I've used the closest printed face I could find.
 
 ![demo video of the lookalike ui](./docs/img/lookalike_demo_video.gif)
 
@@ -18,7 +16,7 @@ To prove that the lookup is actually doing something beyond a random guess, see 
 
 ## Demo
 
-Lookalike is a bit expensive for me to host over the public internet, so the best way to try it out yourself is using my demo image. All you need is [Docker](https://www.docker.com/products/docker-desktop), and an x86-64 (i.e. not M1 Mac) machine. With those prerequisites, simply run:
+Lookalike is a bit expensive for me to host over the internet, so the best way to try it out yourself is using my demo image. All you need is [Docker](https://www.docker.com/products/docker-desktop), and an x86-64 (i.e. not M1 Mac) machine. With those prerequisites, simply run:
 
 ```bash
 docker run -p 8080:8080 -p 8081:8081 -p 5000:5000 ghcr.io/haydenjeune/lookalike-demo:latest
@@ -46,7 +44,7 @@ The purpose of the Worker Job is to fetch an images of a celebrity, generate a v
 
 #### Indexer Job
 
-The purpose of the Indexer Job is to take all of the celebrity face vectors, and build an index to use for an efficient vector similarity search. It does this by scanning the filesystem that the Worker has written the face vectors to, and combining them into a single index for use with the FAISS library, which gives us sub-linear lookup performance. This allows us to use a large number of celebrities, and maximise the chance of a good match.
+The purpose of the Indexer Job is to take all of the celebrity face vectors, and build an index to use for an efficient vector similarity search. It does this by scanning the filesystem that the Worker has written the face vectors to, and combining them into a single index for use with the [FAISS](https://github.com/facebookresearch/faiss) library, which gives us the ability to search a large set of vectors in a time period that increases more slowly than the size of the set of vectors. This allows us to use a large number of celebrities, and still find a match in real time. The size of the database is currently 40,000 faces/vectors, however my testing suggests that it would be able to scale up to around 1m and still return a response in about 500ms. If only I could find a database with that many faces.
 
 #### Api Service
 
