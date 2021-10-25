@@ -1,6 +1,20 @@
 # Lookalike
 
-Lookalike helps you to find your celebrity lookalike!
+Lookalike combines machine learning and an efficient vector similarity search to help you to find your celebrity lookalike!
+
+## Examples
+
+### The UI Flow
+
+Below is the lookalike UI, showcasing the webcam capture and viewing of the results. The results I get a somewhat unflattering, so below is the closest printed face I could find.
+
+![demo video of the lookalike ui](./docs/img/lookalike_demo_video.gif)
+
+To prove that the lookup is actually doing something beyond a random guess, see the below images, where if an unseen image of a famous person's face is given as input (via a highly advanced image transfer technique), lookalike correctly returns themselves as their celebrity lookalike. Neat!
+
+![ryan reynolds](./docs/img/lookalike_demo_ryan_reynolds.png)
+![daisy ridley](./docs/img/lookalike_demo_daisy_ridley.png)
+![john boyega](./docs/img/lookalike_demo_john_boyega.png)
 
 ## Demo
 
@@ -12,13 +26,13 @@ docker run -p 8080:8080 -p 8081:8081 -p 5000:5000 ghcr.io/haydenjeune/lookalike-
 
 When the container has started, open http://localhost:8080 in your web browser.
 
-(Apologies about the ~1GB container image, it's a whole Python interpreter + PyTorch + all of the celebrity images)
+(Apologies about the ~1GB+ container image, it's a whole Python interpreter + PyTorch + all of the celebrity images)
 
 ## How it works
 
 ### Overview
 
-Lookalike uses a [pretrained facial recognition model](https://github.com/timesler/facenet-pytorch) to generate a vector that encodes what your face "looks like", given an image of your face. This vector is then compared to a bank of pre-generated vectors of celebrity faces, and a selection of the closest matches are returned for you to see.
+Lookalike uses a [pretrained facial recognition model](https://github.com/timesler/facenet-pytorch) to generate a vector that encodes what your face "looks like", given an image of your face. This vector is then compared to a bank of over 40,000 celebrity faces, and a selection of the closest matches are returned for you to see. All this happens in under 200ms on my machine.
 
 ### Components
 
@@ -40,7 +54,7 @@ The API Service is a simple Flask API that takes a base64 encoded image, and ret
 
 #### Index Service
 
-The Index Service is a gRPC service which provides an interface to query a FAISS index. The main reason that the FAISS lookup was not done in the API process was that PyTorch and FAISS both rely on OpenMP, and make some relatively incompatible assumptions about which variety of OpenMP libraries must be used, and where they are. The end result is that is was much easier to split the PyTorch and FAISS bit out into separate processes and communicate over gRPC.
+The Index Service is a gRPC service which provides an interface to query a FAISS index. The main reason that the FAISS lookup was not hosted in the API process was that PyTorch and FAISS both rely on OpenMP, and make some relatively incompatible assumptions about which variety of OpenMP libraries must be used, and where they are. The end result is that is was much easier to split the PyTorch and FAISS bit out into separate processes and communicate over gRPC.
 
 #### UI
 
