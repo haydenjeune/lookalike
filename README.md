@@ -2,13 +2,46 @@
 
 Lookalike helps you to find your celebrity lookalike!
 
-Under development - coming soon.
+## Demo
 
-## The Plan
+Lookalike is a bit expensive for me to host over the public internet, so the best way to try it out yourself is using my demo image. All you need is [Docker](https://www.docker.com/products/docker-desktop), and an x86-64 (i.e. not M1 Mac) machine. With those prerequisites, simply run:
 
-The plan is to used a pretrained facial recognition model to output a vector that encodes what a face "looks like". We can use this to generate vectors to represent many different celebrities by passing one picture for each through the model. Then, to find your lookalike celebrity, we run a picture of yours through the model, get the vector, then do a vector similarity search through the celebrity vectors to find the best match.
+```bash
+docker run -p 8080:8080 -p 8081:8081 -p 5000:5000 ghcr.io/haydenjeune/lookalike-demo:latest
+```
 
-For now, we will use one reference picture per celebrity, and do a simple pairwise comparison using the dot product of the two vectors. After that, some ideas for future improvement are:
+When the container has started, open http://localhost:8080 in your web browser.
 
-- Take the mean of several images of the same celebrity as the search vectors
-- Use a vector similarity search library such as [Faiss](https://github.com/facebookresearch/faiss) to do efficient lookups
+(Apologies about the ~1GB container image, it's a whole Python interpreter + PyTorch + all of the celebrity images)
+
+## How it works
+
+### Overview
+
+Lookalike uses a [pretrained facial recognition model](https://github.com/timesler/facenet-pytorch) to generate a vector that encodes what your face "looks like", given an image of your face. This vector is then compared to a bank of pre-generated vectors of celebrity faces, and a selection of the closest matches are returned for you to see.
+
+### Components
+
+#### Scraper Job
+
+The purpose of the Scraper Job is to retrieve a list of celebrity names, and push them to a queue. The best place that I could find to programatically extract names, while still respecting any Robots.txt for the domain was the [IMDB StarMeter page](https://www.imdb.com/search/name/?match_all=true). This page provides 50 names at a time, which the scraper job extracts and pushes to a SNS queue in batches.
+
+#### Worker Job
+
+The purpose of the Worker Job is to fetch an images of a celebrity, generate a vector representation of their face, then save both the image and the generated vector to a filesystem. The Worker reads celebrity names from the output SNS queue of the scraper job, allowing them to be run in parallel. Google Images would be by far the best way to find an image from a persons name, however this is not allowed by their Robots.txt. In lieu of a real search, the worker job tries to manually construct the URL of that persons Wikipedia page, then selects the first image that has a face in it. Any error in this process will result in that name being ignored.
+
+#### Indexer Job
+
+The purpose of the Indexer Job is to take all of the celebrity face vectors, and build an index to use for an efficient vector similarity search. It does this by scanning the filesystem that the Worker has written the face vectors to, and combining them into a single index for use with the FAISS library, which gives us sub-linear lookup performance. This allows us to use a large number of celebrities, and maximise the chance of a good match.
+
+#### Api Service
+
+The API Service is a simple Flask API that takes a base64 encoded image, and returns a list of the closest celebrity matches. It is designed to be called by the UI. The API service decodes the image, detects the face in the image, and runs the facial recognition model to obtain a vector of the users face. It then queries the Index Service, which will return a small number of close matches to that vector, which are returned to the UI.
+
+#### Index Service
+
+The Index Service is a gRPC service which provides an interface to query a FAISS index. The main reason that the FAISS lookup was not done in the API process was that PyTorch and FAISS both rely on OpenMP, and make some relatively incompatible assumptions about which variety of OpenMP libraries must be used, and where they are. The end result is that is was much easier to split the PyTorch and FAISS bit out into separate processes and communicate over gRPC.
+
+#### UI
+
+The UI is a React Application that is bundled into a set of static files. It uses the webcam to take a picture, sends that picture to the API service, and displays the list of celebrity names that it receives.
