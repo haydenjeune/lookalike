@@ -10,8 +10,13 @@ Below is the lookalike UI, showcasing the webcam capture and viewing of the resu
 
 To prove that the lookup is actually doing something beyond a random guess, see the below images, where if an unseen image of a famous person's face is given as input (via a highly advanced image transfer technique), lookalike correctly returns themselves as their celebrity lookalike. Neat!
 
+Ryan Reynolds returns Ryan Reynolds:
 ![ryan reynolds](./docs/img/lookalike_demo_ryan_reynolds.png)
+
+Rey from Star Wars returns Daisy Ridley:
 ![daisy ridley](./docs/img/lookalike_demo_daisy_ridley.png)
+
+Finn from Star Wars returns John Boyega:
 ![john boyega](./docs/img/lookalike_demo_john_boyega.png)
 
 ## Demo
@@ -33,6 +38,8 @@ When the container has started, open http://localhost:8080 in your web browser.
 Lookalike uses a [pretrained facial recognition model](https://github.com/timesler/facenet-pytorch) to generate a vector that encodes what your face "looks like", given an image of your face. This vector is then compared to a bank of over 40,000 celebrity faces, and a selection of the closest matches are returned for you to see. All this happens in under 200ms on my machine.
 
 ### Components
+
+Lookalike consists of several different components, all of which are hosted inside this monorepo. Everything is written in Python and built with [Pants](https://github.com/pantsbuild/pants), except for the UI. I've logically divided the components into jobs and services. Jobs are run as a one off to fetch and process the bank of celebrity names, images, and vectors. Services are the processes which interact with users in real time, and require the bank of celebrity data to provide a result.
 
 #### Scraper Job
 
