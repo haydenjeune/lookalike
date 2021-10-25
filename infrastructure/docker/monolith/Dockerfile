@@ -11,7 +11,7 @@ RUN curl https://github.com/timesler/facenet-pytorch/releases/download/v2.2.9/20
 
 
 FROM python:3.8.12-slim
-LABEL org.opencontainers.image.source https://github.com/haydenjeune/lookalike
+LABEL org.opencontainers.image.source https://github.com/haydenjeune/lookalike-demo
 
 # Install API
 COPY ./dist/src.api /api
@@ -36,5 +36,8 @@ COPY ${IMAGE_ROOT} /images
 # Setup supervisord
 RUN pip install supervisor
 COPY ./infrastructure/docker/monolith/supervisord.conf /etc/supervisord.conf
+
+RUN useradd -mr supervisor
+USER supervisor
 
 CMD ["supervisord", "-n", "-c", "/etc/supervisord.conf"]
